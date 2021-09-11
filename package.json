@@ -8,18 +8,24 @@
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "eslint --ext .js,.ts,.tsx test/ src/"
-    
   },
   "dependencies": {
+    "axios": "^0.21.3",
+    "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
+    "crypto-js": "^4.1.1",
+    "jsencrypt": "^3.2.1",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.11",
+    "vue-axios": "^3.2.5",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.2.0",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "vuex-module-decorators": "^1.0.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.0.2",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
@@ -39,6 +45,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^6.2.2",
     "prettier": "^2.2.1",
+    "prettier-eslint": "^13.0.0",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "typescript": "~4.1.5",
