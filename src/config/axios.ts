@@ -6,6 +6,10 @@ import router from '../router';
 import store from '@/store';
 // import Qs from 'qs';
 import { AxiosResponse, AxiosRequestConfig } from 'axios';
+import publickey from '@/config/publickey';
+import aesUtil from '@/utils/aesUtil';
+import rsaUtil from '@/utils/rsaUtil';
+
 // 超时重新请求配置
 const VUE_APP_URL = process.env.VUE_APP_URL;
 const axiosConfig: AxiosRequestConfig = {
@@ -22,6 +26,8 @@ const axiosConfig: AxiosRequestConfig = {
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
+    'aesKey':'',
+    'fpublicKey':''
   },
 };
 // 修改axios配置信息
@@ -80,17 +86,48 @@ instance.interceptors.request.use(
     // 但是即使token存在，也有可能token是过期的，所以在每次的请求头中携带token
     // 后台根据携带的token判断用户的登录情况，并返回给我们对应的状态码
     // 而后我们可以在响应拦截器中，根据状态码进行一些统一的操作。
+    if(config.data){
+      let aeskey=aesUtil.genKey();
+      let enryObj=JSON.stringify(config.data);
+      let obj={username:'',password:''};
+      obj.username=aesUtil.encrypt(config.data.username,aeskey);
+      obj.password=aesUtil.encrypt(config.data.password,aeskey);
+      console.log('config.data='+enryObj);
+      console.log('aesKey='+aeskey);
+      console.log('aes加密后的文字='+aesUtil.encrypt(enryObj,aeskey));
+      config.data=obj;
+      let aseKeyRsaEncrypt= rsaUtil.RSAencrypt(aeskey,publickey.getPublicKey());
+      console.log('rsa加密后的aesKey='+aseKeyRsaEncrypt);
+      config.headers.aesKey=aseKeyRsaEncrypt;
+      config.headers.fpublicKey=rsaUtil.getFpublicKey();
+    }
+    
     const token = auth.getToken();
     token && (config.headers.Authorization = token);
     return config;
+  },
+   (error:any) => {Promise.reject(error)},
+)
+
+//统一解密
+const decryResponse= (response: AxiosResponse<any>) => {
+  let dataRes=response.data;
+  console.log('后台返回的数据'+JSON.stringify(dataRes));
+  //后台返回aesKey
+  if(dataRes.data.aesKey){
+    let aeskey=rsaUtil.decrypt(dataRes.data.aesKey,rsaUtil.getFprivateKey());
+    console.log('后台返回的aesky'+aeskey);
+    let res=aesUtil.decrypt(dataRes.data.data,aeskey);
+    console.log('后台返回的data'+JSON.stringify(res));
   }
-  // (error:any) => {Promise.reject(error)};
-);
+  console.log("后台返回的数据="+dataRes);
+  return response;
+}
 
 // 响应拦截器
 instance.interceptors.response.use(
   // 请求成功
-  (res) => (res.status === 200 ? Promise.resolve(res) : Promise.reject(res)),
+  (res) => (res.status === 200 ? Promise.resolve(decryResponse(res)) : Promise.reject(res)),
   // 请求失败
   (error) => {
     const { response } = error;

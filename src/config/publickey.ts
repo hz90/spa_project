@@ -13,7 +13,7 @@ export default {
   getPublicKey(): string {
     const token = localStorage.getItem(public_Key);
     if (token) {
-      return token;
+      return '-----BEGIN PUBLIC KEY-----' + token + '-----END PUBLIC KEY-----';
     } else {
       return '';
     }

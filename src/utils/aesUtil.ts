@@ -1,8 +1,8 @@
 import CryptoJS from 'crypto-js';
-
+/* eslint-disable */ 
 export default class aesUtil {
   //获取key，
-  private genKey(length = 16): string {
+  public static genKey(length = 16): string {
     const random =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let str = '';
@@ -11,8 +11,9 @@ export default class aesUtil {
     }
     return str;
   }
+
   //加密
-  public encrypt(plaintext: any, key: any): string {
+  public static encrypt(plaintext: any, key: any): string {
     if (plaintext instanceof Object) {
       //JSON.stringify
       plaintext = JSON.stringify(plaintext);
@@ -26,7 +27,7 @@ export default class aesUtil {
   }
 
   //解密
-  public decrypt(ciphertext: any, key: any): string {
+  public static decrypt(ciphertext: any, key: any): string {
     const decrypt = CryptoJS.AES.decrypt(
       ciphertext,
       CryptoJS.enc.Utf8.parse(key),
