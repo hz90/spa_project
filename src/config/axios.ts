@@ -19,7 +19,7 @@ const axiosConfig: AxiosRequestConfig = {
   //   return data;
   // }],
   // 超时设置s
-  timeout: 10000,
+  timeout: 50000 ,
   // 跨域是否带Token
   withCredentials: true,
   responseType: 'json',
@@ -95,7 +95,7 @@ instance.interceptors.request.use(
       console.log('config.data='+enryObj);
       console.log('aesKey='+aeskey);
       console.log('aes加密后的文字='+aesUtil.encrypt(enryObj,aeskey));
-      config.data=obj;
+      config.data=aesUtil.encrypt(enryObj,aeskey);
       let aseKeyRsaEncrypt= rsaUtil.RSAencrypt(aeskey,publickey.getPublicKey());
       console.log('rsa加密后的aesKey='+aseKeyRsaEncrypt);
       config.headers.aesKey=aseKeyRsaEncrypt;

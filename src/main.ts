@@ -5,10 +5,15 @@ import router from './router';
 import store from './store';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
+import 'normalize.css';
 import { BootstrapVue, BootstrapVueIcons, ToastPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import JsEncrypt from 'jsencrypt';
+import VueLazyload from 'vue-lazyload';
+Vue.use(VueLazyload, {
+  loading: require('@/assets/images/default.png'),
+});
 
 Vue.use(VueAxios, axios);
 Vue.use(BootstrapVue);
