@@ -72,6 +72,13 @@ import { loginStoreVo } from '@/store/vo/login-store-vo';
 export default class LoginVue extends Vue {
   private username = '';
   private password = '';
+  private num = 10;
+  private created(): void {
+    console.log('create' + this.num);
+  }
+  private mounted(): void {
+    console.log('mounted' + this.num);
+  }
   public async login(): Promise<void> {
     await publicKeyStoreModule.exeGetPublicKeyApi();
     console.log('publickey:' + publicKeyStoreModule.getMypublicKey);
