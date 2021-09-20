@@ -5,19 +5,19 @@ import router from './router';
 import store from './store';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
-import { BootstrapVue, BootstrapVueIcons, ToastPlugin } from 'bootstrap-vue';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-vue/dist/bootstrap-vue.css';
+// import { BootstrapVue, BootstrapVueIcons, ToastPlugin } from 'bootstrap-vue';
+// import 'bootstrap/dist/css/bootstrap.css';
+// import 'bootstrap-vue/dist/bootstrap-vue.css';
 import JsEncrypt from 'jsencrypt';
-import VueLazyload from 'vue-lazyload';
-Vue.use(VueLazyload, {
-  loading: require('@/assets/images/default.png'),
-});
+// import VueLazyload from 'vue-lazyload';
+// Vue.use(VueLazyload, {
+//   loading: require('@/assets/images/default.png'),
+// });
 
 Vue.use(VueAxios, axios);
-Vue.use(BootstrapVue);
-Vue.use(ToastPlugin);
-Vue.use(BootstrapVueIcons);
+// Vue.use(BootstrapVue);
+// Vue.use(ToastPlugin);
+// Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = false;
 Vue.prototype.jsEncrypt = JsEncrypt;
 

@@ -114,12 +114,12 @@ const decryResponse= (response: AxiosResponse<any>) => {
   let dataRes=response.data;
   console.log('后台返回的数据'+JSON.stringify(dataRes));
   //后台返回aesKey
-  if(dataRes.data.aesKey){
-    let aeskey=rsaUtil.decrypt(dataRes.data.aesKey,rsaUtil.getFprivateKey());
-    console.log('后台返回的aesky'+aeskey);
-    let res=aesUtil.decrypt(dataRes.data.data,aeskey);
-    console.log('后台返回的data'+JSON.stringify(res));
-  }
+  // if(dataRes.data.aesKey){
+  //   let aeskey=rsaUtil.decrypt(dataRes.data.aesKey,rsaUtil.getFprivateKey());
+  //   console.log('后台返回的aesky'+aeskey);
+  //   let res=aesUtil.decrypt(dataRes.data.data,aeskey);
+  //   console.log('后台返回的data'+JSON.stringify(res));
+  // }
   console.log("后台返回的数据="+dataRes);
   return response;
 }

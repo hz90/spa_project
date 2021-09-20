@@ -38,7 +38,7 @@
                     placeholder="请输入密码"
                   ></b-input>
                 </div>
-                <b-button @click="login" class="btn btn-primary" id="btnLogin"
+                <b-button @click="login()" class="btn btn-primary" id="btnLogin"
                   >登录</b-button
                 >
                 <div style="margin-top: -20px">
