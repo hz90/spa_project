@@ -24,28 +24,42 @@ import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store
 import { SongStoreVo } from '@/store/vo/music-song-vo';
 
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
-import { AppCommon } from '@/store/vo/app-common';
+import { AppCommon, Audio } from '@/store/vo/app-common';
 const baseUrl = process.env.VUE_APP_BASE_API;
 @Component({
   name: 'MusicList',
   components: {},
 })
-/* eslint-disable */
 export default class MusicList extends Vue {
-  private baseUrl:string=baseUrl;
-    private initAppCommon() {
+  private baseUrl: string = baseUrl;
+  private initAppCommon() {
     let appCommon: AppCommon = Object.create(null) as AppCommon;
     appCommon.isShowAsideMenu = false;
     appCommon.isShowAbout = false;
+    appCommon.isPlaying = false;
+    // appCommon.isShowAsideMenu = false; //显示侧边栏
+    // appCommon.isShowMiniMusic = true; //
+    // appCommon.isShowAbout = false; //显示关于界面
+    let audioCommon: Audio = Object.create(null) as Audio;
+    audioCommon.src = 'http://localhost:8081/song/002.mp3';
+    audioCommon.name = 'test';
+    audioCommon.musicImgSrc = 'http://127.0.0.1:8081/img/songPic/HereIam.jpg';
+    audioCommon.index = 0;
+    appCommon.audioCommon = audioCommon;
+    if (appCommonStoreModule.getAppCommon.localAudio) {
+      appCommon.localAudio = appCommonStoreModule.getAppCommon.localAudio;
+    }
     appCommonStoreModule.setAppCommon(appCommon);
   }
   private songStoreVos: SongStoreVo[] = [];
   private beforeCreate() {
     // this.$store.commit('showMiniMusic', true);
   }
-  private async mounted() {}
-  private async created() {
+
+  private async beforeMount() {
+    // if (!appCommonStoreModule.getAppCommon) {
     this.initAppCommon();
+    // }
     console.log('execute MusicList');
     await myClollectSongStoreModule.exeGetMySongsApi();
     this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
@@ -59,19 +73,63 @@ export default class MusicList extends Vue {
   // }
 
   // 点击切换音乐
-  private toggleMusic(index: any): void {
-    // if (this.$store.state.audio.index === index) {
-    //   this.DOM.audio.paused ? this.DOM.audio.play() : this.DOM.audio.pause();
-    //   this.$store.commit('play', !this.isPlaying);
-    // } else {
-    //   this.DOM.audio.play();
-    //   this.$store.commit('play', true);
-    // }
-    // this.$store.commit('toggleMusic', index);
+  private toggleMusic(index: number): void {
+    if (this.songStoreVos[index]) {
+      let songStoreVo: SongStoreVo = this.songStoreVos[index];
+      //点击相同的音乐直接返回
+      let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+      if (
+        appCommonStoreModule.getAppCommon.audioCommon.src ===
+        'http://localhost:8081' + songStoreVo.msrc
+      ) {
+        console.log(
+          '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
+        );
+        if (!appCommon.isPlaying) {
+          appCommon.isPlaying = true;
+          appCommonStoreModule.setAppCommon(appCommon);
+        }
+        return;
+      }
+      console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
+      let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
+      audioCommon.src = 'http://localhost:8081' + songStoreVo.msrc;
+      audioCommon.name = songStoreVo.name;
+      audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      audioCommon.index = 0;
+      appCommon.audioCommon = audioCommon;
+      appCommon.isPlaying = true;
+      appCommonStoreModule.setAppCommon(appCommon);
+      this.playVideo(appCommon);
+    }
+  }
+  private playVideo(appCommon: AppCommon): void {
+    console.log('appCommon.localAudio' + appCommon.localAudio);
+    appCommon.localAudio.src =
+      appCommonStoreModule.getAppCommon.audioCommon.src;
+    appCommon.localAudio.load();
+    // this.nativeAudio.canplay=true;
+    //this.totalTime = this.transformTime(this.nativeAudio.duration);
+    let promise = appCommon.localAudio.play();
+    //解决Uncaught (in promise) DOMException: play() failed because the user didn't interact with the document first.
+    if (promise !== undefined) {
+      promise
+        .then(() => {
+          // Autoplay started
+          console.log('Autoplay started');
+        })
+        // eslint-disable-next-line
+        .catch((error: any) => {
+          console.log(error);
+          // Autoplay was prevented.
+          //this.nativeAudio.muted = true;
+          // this.nativeAudio.play();
+        });
+    }
   }
   // 删除音乐
-  private del(index: any): void {
-    // this.$store.commit('del', index);
+  private del(index: number): void {
+    this.$store.commit('del', index);
   }
 }
 </script>

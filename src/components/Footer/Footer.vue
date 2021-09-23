@@ -50,20 +50,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
-import { Audio } from '@/store/vo/app-common';
+import { AppCommon, Audio } from '@/store/vo/app-common';
 @Component({
   name: 'Footer',
   components: {},
 })
 /* eslint-disable */
 export default class Footer extends Vue {
-  private isPlaying = false;
+  private isPlaying = appCommonStoreModule.getAppCommon.isPlaying;
   private playIcon = 'play-icon';
   private pauseIcon = 'pause-icon';
   private nativeAudio: any = Object.create(null) as any;
   private audio: Audio = Object.create(null) as Audio;
+  // private musicSrc: string = appCommonStoreModule.getAppCommon.audioCommon.src;
   private mounted() {
     this.nativeAudio = document.querySelector('audio');
     console.log(this.nativeAudio);
@@ -75,37 +76,85 @@ export default class Footer extends Vue {
         this.now = this.nativeAudio.currentTime;
       }, 1000);
     });
+    this.nativeAudio.addEventListener('canplay', () => {
+      this.totalTime = this.transformTime(this.nativeAudio.duration);
+      this.now = this.nativeAudio.currentTime;
+
+      setInterval(() => {
+        this.now = this.nativeAudio.currentTime;
+      }, 1000);
+    });
     this.audio = this.audioCommon();
+    let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+    appCommon.localAudio = this.nativeAudio;
+    appCommonStoreModule.setAppCommon(appCommon);
   }
 
-  private isShowMiniMusic(): any {
+  private isShowMiniMusic(): boolean {
     return true;
   }
   private audioCommon(): Audio {
-    appCommonStoreModule.getAppCommon;
-    let audioCommon: Audio = Object.create(null) as Audio;
-    audioCommon.src = 'http://localhost:8081/song/002.mp3';
-    audioCommon.name = 'test';
-    audioCommon.musicImgSrc = 'http://127.0.0.1:8081/img/songPic/HereIam.jpg';
-    audioCommon.index = 0;
-    return audioCommon;
+    let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+    // appCommon.isShowAsideMenu = false;
+    // appCommon.isShowAbout = false;
+    appCommon.isPlaying = false;
+    // appCommon.isShowAsideMenu = false; //显示侧边栏
+    // appCommon.isShowMiniMusic = true; //
+    // appCommon.isShowAbout = false; //显示关于界面
+    console.log('footer init appCommon' + JSON.stringify(appCommon));
+    if (!appCommon.audioCommon) {
+      let audioCommon: Audio = Object.create(null) as Audio;
+      audioCommon.src = 'http://localhost:8081/song/002.mp3';
+      audioCommon.name = 'test';
+      audioCommon.musicImgSrc = 'http://127.0.0.1:8081/img/songPic/HereIam.jpg';
+      audioCommon.index = 0;
+      appCommon.audioCommon = audioCommon;
+    }
+    appCommonStoreModule.setAppCommon(appCommon);
+    return appCommon.audioCommon;
   }
-  private DOM(): any {
-    return this.$store.state.DOM;
-  }
-  private musicData(): any {
-    return this.$store.state.musicData;
-  }
-  private skinColor(): any {
+  private skinColor(): string {
     return this.$store.state.skinColor;
   }
 
   private now: number = 0;
-  private totalTime: any = '0:00';
-  private defaultImg: any = '/assests/images/default.png';
+  private totalTime: string = '0:00';
+  private defaultImg: string = '/assests/images/default.png';
 
+  @Watch('audio.src')
+  private autoChangeMusic() {
+    console.log('点击音乐发生变更');
+    if (this.audio.src) {
+      console.log('点击音乐发生变更');
+      let isPlaying = appCommonStoreModule.getAppCommon.isPlaying;
+      this.playVideo(isPlaying);
+    }
+  }
+  private playVideo(isPlaying: boolean): void {
+    if (isPlaying) {
+      this.isPlaying = isPlaying;
+      this.nativeAudio.src = appCommonStoreModule.getAppCommon.audioCommon.src;
+      this.nativeAudio.load();
+      // this.nativeAudio.canplay=true;
+      //this.totalTime = this.transformTime(this.nativeAudio.duration);
+      let promise = this.nativeAudio.play();
+      //解决Uncaught (in promise) DOMException: play() failed because the user didn't interact with the document first.
+      if (promise !== undefined) {
+        promise
+          .then(() => {
+            // Autoplay started
+            console.log('Autoplay started');
+          })
+          .catch((error: any) => {
+            console.log(error);
+            // Autoplay was prevented.
+            //this.nativeAudio.muted = true;
+            // this.nativeAudio.play();
+          });
+      }
+    }
+  }
   private play(): void {
-    // this.$store.commit('play', !this.isPlaying);
     this.isPlaying = !this.isPlaying;
     !this.isPlaying ? this.nativeAudio.pause() : this.nativeAudio.play();
   }
@@ -143,7 +192,7 @@ export default class Footer extends Vue {
     }
   }
   private touchEnd(event: any): void {
-     console.log('touchEnd');
+    console.log('touchEnd');
     let nowstyle: any = this.$refs.now;
     if (nowstyle) {
       this.nativeAudio.currentTime =
@@ -153,6 +202,7 @@ export default class Footer extends Vue {
     this.now = this.nativeAudio.currentTime;
     this.nativeAudio.play();
     this.isPlaying = true;
+    // this.play();
     //this.$store.commit('play', true);
   }
   private transformTime(seconds: any): any {

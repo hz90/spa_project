@@ -2,7 +2,7 @@
   <div id="app">
     <!-- 主界面部分 -->
     <transition name="show">
-      <div v-show="isShowIndex" class="index">
+      <div v-show="isShowIndex()" class="index">
         <!-- 侧边栏 -->
         <AsideMenu v-show="isShowAsideMenu()"></AsideMenu>
 
@@ -41,7 +41,7 @@
     </audio>
 
     <!-- 关于界面 -->
-    <About v-if="isShowAbout()"></About>
+    <AboutVue v-if="isShowAbout()"></AboutVue>
   </div>
 </template>
 <script lang="ts">
@@ -50,16 +50,16 @@ import MusicHeader from '@/components/Header/MusicHeader.vue';
 import VFooter from '@/components/Footer/Footer.vue';
 import AsideMenu from '@/components/AsideMenu/AsideMenu.vue';
 import Play from '@/components/Play/Play.vue';
-import About from '@/components/About/About.vue';
+import AboutVue from '@/components/About/AboutVue.vue';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 // import { AppCommon } from '@/store/vo/app-common';
 @Component({
   name: 'App',
-  components: { MusicHeader, VFooter, AsideMenu, Play, About },
+  components: { MusicHeader, VFooter, AsideMenu, Play, AboutVue },
 })
-/* eslint-disable */
 export default class App extends Vue {
   private msrc = 'http://localhost:8081/song/002.mp3';
+  private showAsideMenu = appCommonStoreModule.getAppCommon.isShowAsideMenu;
   private beforeCreate() {
     // this.$store.dispatch('getData');
   }
@@ -86,31 +86,31 @@ export default class App extends Vue {
   //     return 'http://localhost:8081/song/002.mp3';
   //   // }
   // }
-  private isPlaying(): any {
+  private isPlaying(): boolean {
     return true;
   }
-  private DOM(): any {
-    return this.$store.state.DOM;
-  }
+  // private DOM(): any {
+  //   return this.$store.state.DOM;
+  // }
 
-  private isShowSearch(): any {
-    return this.$store.state.isShowSearch;
-  }
-  private isShowIndex(): any {
+  // private isShowSearch(): any {
+  //   return this.$store.state.isShowSearch;
+  // }
+  private isShowIndex(): boolean {
     return true;
   }
-  private isShowAbout(): any {
+  private isShowAbout(): boolean {
     if (appCommonStoreModule.getAppCommon.isShowAbout) {
       return appCommonStoreModule.getAppCommon.isShowAbout;
     } else {
       return false;
     }
   }
-  private musicData(): any {
-    return [];
-  }
+  // private musicData(): any {
+  //   return [];
+  // }
 
-  private defaultSrc: string = 'http://localhost:8081/song/002.mp3';
+  // private defaultSrc: string = 'http://localhost:8081/song/002.mp3';
 
   //  private   next():void {
   //       // this.audio.index = this.audio.index === this.musicData.length - 1 ? 0 : (++this.audio.index);

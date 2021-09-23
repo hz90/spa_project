@@ -26,7 +26,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon } from '@/store/vo/app-common';
 @Component({
-  name: 'MusicHeaderVue',
+  name: 'MusicHeader',
   components: {},
 })
 export default class MusicHeader extends Vue {
@@ -50,10 +50,10 @@ export default class MusicHeader extends Vue {
     appCommon.isShowAsideMenu = true;
     appCommonStoreModule.setAppCommon(appCommon);
   }
-  /* eslint-disable */ 
-  private beforeRouteLeave(to: any, from: any, next: any) {
-    next();
-  }
+  // /* eslint-disable */
+  // private beforeRouteLeave(to: any, from: any, next: any) {
+  //   next();
+  // }
 }
 </script>
 

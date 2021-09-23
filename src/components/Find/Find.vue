@@ -43,12 +43,10 @@
           class="music-item"
         >
           <img v-bind:src="baseUrl + item.psrc" class="music-img" />
-          <span class="music-name">{{
+          <span @click="toggleMusic(index)" class="music-name">{{
             index + 1 + '.&nbsp; ' + item.name
           }}</span>
         </div>
-
-        <div class="tips">没有更多歌曲了～</div>
 
         <div
           v-show="isShowHistory && searchHistory.length"
@@ -71,6 +69,8 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { songStoreModule } from '@/store/modules/song-store';
 import { SongStoreVo } from '@/store/vo/music-song-vo';
+import { appCommonStoreModule } from '@/store/modules/app-common-store';
+import { AppCommon, Audio } from '@/store/vo/app-common';
 const baseUrl = process.env.VUE_APP_BASE_API;
 @Component({
   name: 'Find',
@@ -78,8 +78,8 @@ const baseUrl = process.env.VUE_APP_BASE_API;
 })
 /* eslint-disable */
 export default class Find extends Vue {
-    private baseUrl:string=baseUrl;
-  private songStoreVos:SongStoreVo[]=songStoreModule.getSongs;
+  private baseUrl: string = baseUrl;
+  private songStoreVos: SongStoreVo[] = songStoreModule.getSongs;
   private beforeCreate() {
     // this.$store.commit('showMiniMusic', true);
   }
@@ -89,15 +89,13 @@ export default class Find extends Vue {
     // });
   }
   private mounted() {
-    // this.$store.commit('changeLinkBorderIndex', 2);
-  }
-  private musicData(): any {
-    return this.$store.state.musicData;
+    //初始化清空前一次搜索
+    this.songStoreVos=[];
   }
 
   private keywords: string = '';
   private hotKeywords: any = [];
-  private isShowHot: any = true;
+  private isShowHot: boolean = true;
   private musicList: any = [];
   private playIndex: any = '';
   private isLoading: any = false;
@@ -106,40 +104,65 @@ export default class Find extends Vue {
     (localStorage.searchHistory && JSON.parse(localStorage.searchHistory)) ||
     [];
 
-  private async toSearch(keywords: string):Promise<void> {
+  private async toSearch(keywords: string): Promise<void> {
     if (keywords.trim()) {
-      this.songStoreVos=[];
+      this.songStoreVos = [];
       this.isShowHistory = false;
       this.isShowHot = false;
       this.playIndex = null;
       this.isLoading = true;
-    //  this.$store.commit('showMiniMusic', false);
+      //  this.$store.commit('showMiniMusic', false);
       this.keywords = keywords;
-    await  songStoreModule.exeGetSongsApi(keywords);
-     this.songStoreVos=songStoreModule.getSongs;
+      this.songStoreVos=[];
+      await songStoreModule.exeGetSongsApi(keywords);
+      this.songStoreVos = songStoreModule.getSongs;
       this.isLoading = false;
-      // this.axios
-      //   .get('/api/search/100/' + keywords)
-      //   .then((res) => res.data.data.song)
-      //   .then((song) => {
-      //     this.musicList = song.list;
-      //     this.isLoading = false;
-      //     this.searchHistory.unshift(keywords);
-      //   });
     }
   }
-  // 搜索结果点击播放音乐
-  private playMusic(index: any, name: any, src: any, imgSrc: any): void {
-    src = 'http://ws.stream.qqmusic.qq.com/' + src + '.m4a?fromtag=46';
-    this.$store.commit('playMusic', { name: name, src: src, imgSrc: imgSrc });
-    this.$store.commit('addMusic', {
-      name: name,
-      src: src,
-      musicImgSrc: imgSrc,
-    });
-    this.$store.commit('showMiniMusic', true);
-    this.playIndex = index;
+
+ // 点击切换音乐
+  private toggleMusic(index: number): void {
+    if (this.songStoreVos[index]) {
+      let songStoreVo: SongStoreVo = this.songStoreVos[index];
+      //点击相同的音乐直接返回
+      let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+      if (
+        appCommonStoreModule.getAppCommon.audioCommon.src ===
+        'http://localhost:8081' + songStoreVo.msrc
+      ) {
+        console.log(
+          '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
+        );
+        if (!appCommon.isPlaying) {
+          appCommon.isPlaying = true;
+          appCommonStoreModule.setAppCommon(appCommon);
+        }
+        return;
+      }
+      console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
+      let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
+      audioCommon.src = 'http://localhost:8081' + songStoreVo.msrc;
+      audioCommon.name = songStoreVo.name;
+      audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      audioCommon.index = 0;
+      appCommon.audioCommon = audioCommon;
+      appCommon.isPlaying = true;
+      appCommonStoreModule.setAppCommon(appCommon);
+    }
   }
+
+  // 搜索结果点击播放音乐
+  // private playMusic(index: any, name: any, src: any, imgSrc: any): void {
+  //   src = 'http://ws.stream.qqmusic.qq.com/' + src + '.m4a?fromtag=46';
+  //   this.$store.commit('playMusic', { name: name, src: src, imgSrc: imgSrc });
+  //   this.$store.commit('addMusic', {
+  //     name: name,
+  //     src: src,
+  //     musicImgSrc: imgSrc,
+  //   });
+  //   this.$store.commit('showMiniMusic', true);
+  //   this.playIndex = index;
+  // }
   private inputFocus() {
     if (this.keywords.trim()) {
       return;
@@ -152,9 +175,12 @@ export default class Find extends Vue {
 
   // 解码
   private strDecode(str: any): any {
-    return str.replace(/&#(x)?([^&]{1,5});?/g, function ($:any, $1:any, $2:any) {
-      return String.fromCharCode(parseInt($2, $1 ? 16 : 10));
-    });
+    return str.replace(
+      /&#(x)?([^&]{1,5});?/g,
+      function ($: any, $1: any, $2: any) {
+        return String.fromCharCode(parseInt($2, $1 ? 16 : 10));
+      }
+    );
   }
 }
 </script>
@@ -387,21 +413,21 @@ export default class Find extends Vue {
         }
       }
     }
-     .music-item {
-    // box-shadow: 0 0 1px #DD2C00;
-    padding: 4px 6px 0 6px;
-    position: relative;
-    margin-bottom: 4px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-
-    .music-img {
-      width: 50px;
-      height: 50px;
+    .music-item {
+      // box-shadow: 0 0 1px #DD2C00;
+      padding: 4px 6px 0 6px;
+      position: relative;
+      margin-bottom: 4px;
       border-radius: 5px;
+      cursor: pointer;
+      border: none;
+
+      .music-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 5px;
+      }
     }
-     }
   }
 }
 @keyframes listening {

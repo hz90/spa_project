@@ -55,10 +55,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 @Component({
-  name: 'Find',
+  name: 'Social',
   components: {},
 })
-/* eslint-disable */
 export default class Social extends Vue {
   private beforeCreate() {
     // this.$store.commit('showMiniMusic', false);
@@ -70,16 +69,16 @@ export default class Social extends Vue {
     // this.$store.commit('changeLinkBorderIndex', 3);
   }
 
-  private date: any = '';
-  private volume: any = '';
-  private imgUrl: any = '';
-  private picInfo: any = '';
-  private forward: any = '';
-  private wordsInfo: any = '';
-  private index: any = 0;
-  private isLoading: any = false;
-  private isShowMask: any = true;
-  private isShowControl: any = false;
+  private date = '';
+  private volume = '';
+  private imgUrl = '';
+  private picInfo = '';
+  private forward = '';
+  private wordsInfo = '';
+  private index = 0;
+  private isLoading = false;
+  private isShowMask = true;
+  private isShowControl = false;
 
   private getOne(index = 0): void {
     if (index > 9) {
@@ -91,22 +90,22 @@ export default class Social extends Vue {
       return;
     }
     this.isLoading = true;
-    this.axios
-      .get('/api/one/' + index)
-      .then((res) => res.data.data.content_list[0])
-      .then((one) => {
-        this.date = one.post_date.split(' ')[0].replace(/\-/g, ' / ');
-        this.volume = one.volume;
-        this.imgUrl = one.img_url;
-        this.picInfo = one.pic_info;
-        this.forward = one.forward;
-        this.wordsInfo = one.words_info;
-        this.isLoading = false;
-        this.isShowMask = false;
-        setTimeout(() => {
-          this.isShowControl = false;
-        }, 250);
-      });
+    // this.axios
+    //   .get('/api/one/' + index)
+    //   .then((res) => res.data.data.content_list[0])
+    //   .then((one) => {
+    //     this.date = one.post_date.split(' ')[0].replace(/\-/g, ' / ');
+    //     this.volume = one.volume;
+    //     this.imgUrl = one.img_url;
+    //     this.picInfo = one.pic_info;
+    //     this.forward = one.forward;
+    //     this.wordsInfo = one.words_info;
+    //     this.isLoading = false;
+    //     this.isShowMask = false;
+    //     setTimeout(() => {
+    //       this.isShowControl = false;
+    //     }, 250);
+    //   });
   }
 }
 </script>

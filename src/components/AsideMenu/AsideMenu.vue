@@ -1,14 +1,14 @@
 <template lang="html">
   <transition name="fadeIn">
     <div class="aside-menu">
-      <i @click="showAsideMenu" class="back"></i>
+      <i @click="showAsideMenu()" class="back"></i>
       <div class="aside">
         <div :style="{ backgroundColor: skinColor }" class="info">
-          <a href="https://zhz.com/" target="_blank" class="avatar"
-            ><img src="@/assets/images/default.png" alt="zhz.com"
-          /></a>
+          <!-- <a href="#" target="_blank" class="avatar"> -->
+          <img src="@/assets/images/default.png" alt="zhz.com" />
+          <!-- </a> -->
           <div class="about">
-            <span class="name"><a href="https://zhz.com/">zhz</a></span>
+            <span class="name"><a href="#">zhz</a></span>
             <span class="level">Lv100</span>
             <span @click="isSignIn = true" class="sign">
               <i></i>
@@ -56,6 +56,7 @@ import { AppCommon } from '@/store/vo/app-common';
   components: {},
 })
 export default class AsideMenu extends Vue {
+  //
   private linkBorderIndex = 1;
   private skinColor = '#B72712';
 
