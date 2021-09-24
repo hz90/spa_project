@@ -148,6 +148,31 @@ export default class Find extends Vue {
       appCommon.audioCommon = audioCommon;
       appCommon.isPlaying = true;
       appCommonStoreModule.setAppCommon(appCommon);
+      this.playVideo(appCommon);
+    }
+  }
+   private playVideo(appCommon: AppCommon): void {
+    console.log('appCommon.localAudio' + appCommon.localAudio);
+    appCommon.localAudio.src =
+      appCommonStoreModule.getAppCommon.audioCommon.src;
+    appCommon.localAudio.load();
+    // this.nativeAudio.canplay=true;
+    //this.totalTime = this.transformTime(this.nativeAudio.duration);
+    let promise = appCommon.localAudio.play();
+    //解决Uncaught (in promise) DOMException: play() failed because the user didn't interact with the document first.
+    if (promise !== undefined) {
+      promise
+        .then(() => {
+          // Autoplay started
+          console.log('Autoplay started music find');
+        })
+        // eslint-disable-next-line
+        .catch((error: any) => {
+          console.log(error);
+          // Autoplay was prevented.
+          //this.nativeAudio.muted = true;
+          // this.nativeAudio.play();
+        });
     }
   }
 

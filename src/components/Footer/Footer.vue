@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon, Audio } from '@/store/vo/app-common';
 @Component({
@@ -59,15 +59,16 @@ import { AppCommon, Audio } from '@/store/vo/app-common';
 })
 /* eslint-disable */
 export default class Footer extends Vue {
-  private isPlaying = appCommonStoreModule.getAppCommon.isPlaying;
+  private isPlaying = false;
   private playIcon = 'play-icon';
   private pauseIcon = 'pause-icon';
   private nativeAudio: any = Object.create(null) as any;
   private audio: Audio = Object.create(null) as Audio;
   // private musicSrc: string = appCommonStoreModule.getAppCommon.audioCommon.src;
   private mounted() {
+    this.isPlaying= appCommonStoreModule.getAppCommon.isPlaying;
     this.nativeAudio = document.querySelector('audio');
-    console.log(this.nativeAudio);
+    console.log('Footer mounted'+this.nativeAudio);
     this.nativeAudio.addEventListener('play', () => {
       this.totalTime = this.transformTime(this.nativeAudio.duration);
       this.now = this.nativeAudio.currentTime;
@@ -86,7 +87,10 @@ export default class Footer extends Vue {
     });
     this.audio = this.audioCommon();
     let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
-    appCommon.localAudio = this.nativeAudio;
+    if(!appCommon.localAudio ){
+
+      appCommon.localAudio = this.nativeAudio;
+    }
     appCommonStoreModule.setAppCommon(appCommon);
   }
 
@@ -121,7 +125,7 @@ export default class Footer extends Vue {
   private totalTime: string = '0:00';
   private defaultImg: string = '/assests/images/default.png';
 
-  @Watch('audio.src')
+
   private autoChangeMusic() {
     console.log('点击音乐发生变更');
     if (this.audio.src) {

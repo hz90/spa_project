@@ -116,7 +116,7 @@ export default class MusicList extends Vue {
       promise
         .then(() => {
           // Autoplay started
-          console.log('Autoplay started');
+          console.log('Autoplay started music');
         })
         // eslint-disable-next-line
         .catch((error: any) => {
