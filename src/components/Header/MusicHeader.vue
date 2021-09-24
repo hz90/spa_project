@@ -15,7 +15,7 @@
         <span @click="toSearch">发现</span>
       </div>
       <div v-bind:class="{ link: linkBorderIndex == 3 }" class="item">
-        <span @click="toSocial">一个</span>
+        <span @click="toSocial">登录</span>
       </div>
     </div>
   </div>

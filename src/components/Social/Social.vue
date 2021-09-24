@@ -1,55 +1,114 @@
 <template lang="html">
-  <transition name="showRouter">
-    <div
-      @click="isShowControl = true"
-      @touchend="isShowControl = true"
-      class="social"
-    >
-      <div v-show="isShowMask" class="mask">
-        <div class="loading"><i class="icon-loading"></i>加载中</div>
+  <div id="logreg-forms">
+    <form class="form-signin">
+      <h1 class="h3 mb-3 font-weight-normal" style="text-align: center">
+        Sign in
+      </h1>
+      <div class="social-login">
+        <button class="btn facebook-btn social-btn" type="button">
+          <span><i class="fab fa-facebook-f"></i> Sign in with Facebook</span>
+        </button>
+        <button class="btn google-btn social-btn" type="button">
+          <span><i class="fab fa-google-plus-g"></i> Sign in with Google+</span>
+        </button>
+      </div>
+      <p style="text-align: center">OR</p>
+      <input
+        type="email"
+        id="inputEmail"
+        class="form-control"
+        placeholder="Email address"
+        required=""
+        autofocus=""
+      />
+      <input
+        type="password"
+        id="inputPassword"
+        class="form-control"
+        placeholder="Password"
+        required=""
+      />
+
+      <button class="btn btn-success btn-block" type="submit">
+        <i class="fas fa-sign-in-alt"></i> Sign in
+      </button>
+      <a href="#" id="forgot_pswd">Forgot password?</a>
+      <hr />
+      <!-- <p>Don't have an account!</p>  -->
+      <button class="btn btn-primary btn-block" type="button" id="btn-signup">
+        <i class="fas fa-user-plus"></i> Sign up New Account
+      </button>
+    </form>
+
+    <form action="/reset/password/" class="form-reset">
+      <input
+        type="email"
+        id="resetEmail"
+        class="form-control"
+        placeholder="Email address"
+        required=""
+        autofocus=""
+      />
+      <button class="btn btn-primary btn-block" type="submit">
+        Reset Password
+      </button>
+      <a href="#" id="cancel_reset"><i class="fas fa-angle-left"></i> Back</a>
+    </form>
+
+    <form action="/signup/" class="form-signup">
+      <div class="social-login">
+        <button class="btn facebook-btn social-btn" type="button">
+          <span><i class="fab fa-facebook-f"></i> Sign up with Facebook</span>
+        </button>
+      </div>
+      <div class="social-login">
+        <button class="btn google-btn social-btn" type="button">
+          <span><i class="fab fa-google-plus-g"></i> Sign up with Google+</span>
+        </button>
       </div>
 
-      <div class="title">
-        <div v-text="date" class="date"></div>
-        <div v-text="volume" class="title-desc"></div>
-      </div>
+      <p style="text-align: center">OR</p>
 
-      <div class="img">
-        <img v-bind:src="imgUrl" alt="插画 - microzz.com" />
-        <div class="img-desc">插画 | {{ picInfo }}</div>
-      </div>
+      <input
+        type="text"
+        id="user-name"
+        class="form-control"
+        placeholder="Full name"
+        required=""
+        autofocus=""
+      />
+      <input
+        type="email"
+        id="user-email"
+        class="form-control"
+        placeholder="Email address"
+        required
+        autofocus=""
+      />
+      <input
+        type="password"
+        id="user-pass"
+        class="form-control"
+        placeholder="Password"
+        required
+        autofocus=""
+      />
+      <input
+        type="password"
+        id="user-repeatpass"
+        class="form-control"
+        placeholder="Repeat Password"
+        required
+        autofocus=""
+      />
 
-      <div class="content">
-        <p v-text="forward"></p>
-        <div v-text="wordsInfo" class="content-desc"></div>
-      </div>
-
-      <transition name="fade">
-        <div v-show="isShowControl" class="control">
-          <div class="prev">
-            <a
-              @click="getOne(--index)"
-              :class="{ gray: index === 0 }"
-              href="javascript:;"
-              >上一篇</a
-            >
-          </div>
-          <div class="loading">
-            <div v-if="!isLoading" class="one">One</div>
-            <div v-else class="icon-loading"></div>
-          </div>
-          <div class="next">
-            <a
-              @click="getOne(++index)"
-              :class="{ gray: index === 9 }"
-              href="javascript:;"
-              >下一篇</a
-            >
-          </div>
-        </div>
-      </transition>
-    </div>
-  </transition>
+      <button class="btn btn-primary btn-block" type="submit">
+        <i class="fas fa-user-plus"></i> Sign Up
+      </button>
+      <a href="#" id="cancel_signup"><i class="fas fa-angle-left"></i> Back</a>
+    </form>
+    <br />
+  </div>
 </template>
 
 <script lang="ts">
@@ -77,7 +136,7 @@ export default class Social extends Vue {
   private wordsInfo = '';
   private index = 0;
   private isLoading = false;
-  private isShowMask = true;
+  private isShowMask = false;
   private isShowControl = false;
 
   private getOne(index = 0): void {
@@ -111,185 +170,125 @@ export default class Social extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.showRouter-enter-active {
-  transition: all 0.3s ease;
+/* sign in FORM */
+#logreg-forms {
+  width: 412px;
+  margin: 10vh auto;
+  background-color: #f3f3f3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
-.showRouter-leave-active {
-  transition: all 0 ease-out;
-}
-.showRouter-enter,
-.showRouter-leave-active {
-  transform: translateX(450px);
-  opacity: 0;
-}
-.fade-enter-active {
-  transition: all 0.3s ease-in-out;
-}
-.fade-leave-active {
-  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
-}
-.fade-enter,
-.fade-leave-active {
-  transform: translateY(50px);
-  opacity: 0;
-}
-.social {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+#logreg-forms form {
   width: 100%;
-  height: 100%;
-  flex: 7;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.05);
-  padding-bottom: 200px;
-  .mask {
-    position: absolute;
-    z-index: 2;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: white;
-    .loading {
-      text-align: center;
-      padding-top: 20px;
-      font-size: 120%;
-      .icon-loading {
-        display: inline-block;
-        width: 30px;
-        height: 30px;
-        background: url('./loading.svg') no-repeat;
-        background-size: contain;
-        animation: loading 0.6s linear infinite;
-        vertical-align: text-bottom;
-        margin-right: 10px;
-      }
-    }
-  }
-  .title {
-    flex: 1;
-    text-align: center;
-    .date {
-      // width: 200px;
-      padding-top: 5px;
-      margin: auto;
-      font-weight: bold;
-      font-size: 110%;
-      position: relative;
-      text-align: center;
-      letter-spacing: 2px;
-    }
-    .title-desc {
-      color: #808080;
-      font-size: 50%;
-      letter-spacing: 2px;
-    }
-  }
-  .img {
-    // flex: 4;
-    padding-bottom: 10px;
-    margin-top: 4px;
-    margin-bottom: 5px;
-    img {
-      width: 100%;
-      height: auto;
-    }
-    .img-desc {
-      text-align: center;
-      font-size: 50%;
-      color: #808080;
-    }
-  }
-  .content {
-    // flex: 2;
-    padding: 2px 10px;
-    p {
-      font-size: 80%;
-      color: #000;
-      margin-bottom: 4px;
-    }
-    .content-desc {
-      text-align: center;
-      font-size: 40%;
-      color: #808080;
-    }
+  max-width: 410px;
+  padding: 15px;
+  margin: auto;
+}
+#logreg-forms .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+#logreg-forms .form-control:focus {
+  z-index: 2;
+}
+#logreg-forms .form-signin input[type='email'] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+#logreg-forms .form-signin input[type='password'] {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+#logreg-forms .social-login {
+  width: 390px;
+  margin: 0 auto;
+  margin-bottom: 14px;
+}
+#logreg-forms .social-btn {
+  font-weight: 100;
+  color: white;
+  width: 190px;
+  font-size: 0.9rem;
+}
+
+#logreg-forms a {
+  display: block;
+  padding-top: 10px;
+  color: lightseagreen;
+}
+
+#logreg-form .lines {
+  width: 200px;
+  border: 1px solid red;
+}
+
+#logreg-forms button[type='submit'] {
+  margin-top: 10px;
+}
+
+#logreg-forms .facebook-btn {
+  background-color: #3c589c;
+}
+
+#logreg-forms .google-btn {
+  background-color: #df4b3b;
+}
+
+#logreg-forms .form-reset,
+#logreg-forms .form-signup {
+  display: none;
+}
+
+#logreg-forms .form-signup .social-btn {
+  width: 210px;
+}
+
+#logreg-forms .form-signup input {
+  margin-bottom: 2px;
+}
+
+.form-signup .social-login {
+  width: 210px !important;
+  margin: 0 auto;
+}
+
+/* Mobile */
+
+@media screen and (max-width: 600px) {
+  #logreg-forms {
+    width: 300px;
+    height: 100%;
   }
 
-  .control {
-    position: fixed;
-    bottom: 0;
-    // left: 0;
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    text-align: center;
-    background-color: none;
-    width: 100%;
-    padding: 10px 0;
-    a {
-      color: black;
-      position: relative;
-      // background-color: gray;
-    }
-    .gray {
-      color: gray;
-    }
-    a::after {
-      content: '';
-      position: absolute;
-      bottom: -3px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background-color: gray;
-      transform: scaleX(0);
-      transition: all 0.4s ease-in-out;
-    }
-    a:hover::after {
-      transform: scaleX(1);
-    }
-    .prev {
-      flex: 1;
-    }
-    .loading {
-      flex: 1;
-      .icon-loading {
-        margin: auto;
-        width: 22px;
-        height: 22px;
-        background: url('./loading.svg') no-repeat;
-        background-size: contain;
-        animation: loading 0.6s linear infinite;
-        // transform: rotate(360deg);
-        // transition: 5s ease-in-out;
-      }
-    }
-    .next {
-      flex: 1;
-    }
+  #logreg-forms .social-login {
+    width: 200px;
+    margin: 0 auto;
+    margin-bottom: 10px;
   }
-  @media screen and(min-width: 769px) {
-    .control {
-      width: 460px;
-    }
+  #logreg-forms .social-btn {
+    font-size: 1.3rem;
+    font-weight: 100;
+    color: white;
+    width: 200px;
+    height: 56px;
   }
-  .control::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: rgba(0, 0, 0, 0.1);
+  #logreg-forms .social-btn:nth-child(1) {
+    margin-bottom: 5px;
   }
-}
-@keyframes loading {
-  from {
-    transform: rotate(0);
+  #logreg-forms .social-btn span {
+    display: none;
   }
-  to {
-    transform: rotate(360deg);
+  #logreg-forms .facebook-btn:after {
+    content: 'Facebook';
+  }
+
+  #logreg-forms .google-btn:after {
+    content: 'Google+';
   }
 }
 </style>
