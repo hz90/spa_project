@@ -58,7 +58,6 @@ import { Audio } from '@/store/vo/app-common';
   name: 'Footer',
   components: {},
 })
-/* eslint-disable */
 export default class Footer extends Vue {
   @Prop({ default: false })
   private isPlaying!: boolean;
@@ -136,7 +135,7 @@ export default class Footer extends Vue {
   private skinColor(): string {
     return this.$store.state.skinColor;
   }
-  private defaultImg: string = '/assests/images/default.png';
+  private defaultImg = '/assests/images/default.png';
 
   // private autoChangeMusic() {
   //   console.log('点击音乐发生变更');
@@ -183,17 +182,20 @@ export default class Footer extends Vue {
     // this.$store.commit('showIndex', false);
     // this.$store.commit('showMiniMusic', false);
   }
+  // eslint-disable-next-line
   private changeTime(event: any): void {
-    let progressBaRefr: any = this.$refs.progressBar;
+    let progressBaRefr = this.$refs.progressBar;
     this.$emit('fatherMethodChangeTime', event, progressBaRefr);
   }
+  // eslint-disable-next-line
   private touchMove(event: any): void {
-    let progressBaRefr: any = this.$refs.progressBar;
-    let nowRef: any = this.$refs.now;
-    this.$emit('fatherMethodTouchMove', progressBaRefr,nowRef);
+    let progressBaRefr = this.$refs.progressBar;
+    let nowRef = this.$refs.now;
+    this.$emit('fatherMethodTouchMove', progressBaRefr, nowRef);
   }
+  // eslint-disable-next-line
   private touchEnd(event: any): void {
-    let progressBaRefr: any = this.$refs.now;
+    let progressBaRefr = this.$refs.now;
     this.$emit('fatherMethodTouchEnd', progressBaRefr);
   }
   // private changeTime(event: any): void {
@@ -237,13 +239,12 @@ export default class Footer extends Vue {
   //   // this.play();
   //   //this.$store.commit('play', true);
   // }
-  private transformTime(seconds: any): any {
-    let m: any, s: any;
-    m = Math.floor(seconds / 60);
-    m = m.toString().length == 1 ? '0' + m : m;
-    s = Math.floor(seconds - 60 * m);
-    s = s.toString().length == 1 ? '0' + s : s;
-    return m + ':' + s;
+  private transformTime(seconds: number): string {
+    let m: number = Math.floor(seconds / 60);
+    let m1 = m.toString().length == 1 ? '0' + m : m;
+    let s = Math.floor(seconds - 60 * Number(m1));
+    let s1 = s.toString().length == 1 ? '0' + s : s;
+    return m + ':' + s1;
   }
 }
 </script>

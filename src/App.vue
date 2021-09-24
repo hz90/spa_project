@@ -68,7 +68,6 @@ import { AppCommon, Audio } from '@/store/vo/app-common';
   name: 'App',
   components: { MusicHeader, Footer, AsideMenu, Play, AboutVue },
 })
-/* eslint-disable */
 export default class App extends Vue {
   // private isPlayingCommon = appCommonStoreModule.getAppCommon.isPlaying;
   private now = 0;
@@ -99,22 +98,7 @@ export default class App extends Vue {
       appCommon.localAudio = appCommonStoreModule.getAppCommon.localAudio;
     }
     appCommonStoreModule.setAppCommon(appCommon);
-    // this.audioRef.addEventListener('play', () => {
-    //   this.totalTime = this.transformTime(this.audioRef.duration);
-    //   this.now = this.audioRef.currentTime;
 
-    //   setInterval(() => {
-    //     this.now = this.audioRef.currentTime;
-    //   }, 1000);
-    // });
-    // this.audioRef.addEventListener('canplay', () => {
-    //   this.totalTime = this.transformTime(this.audioRef.duration);
-    //   this.now = this.audioRef.currentTime;
-
-    //   setInterval(() => {
-    //     this.now = this.audioRef.currentTime;
-    //   }, 1000);
-    // });
     console.log('app commponent is init createAudio' + this.audioRef);
     appCommon = appCommonStoreModule.getAppCommon;
     appCommon.localAudio = this.audioRef;
@@ -131,23 +115,8 @@ export default class App extends Vue {
   private get isPlayingCommon() {
     return appCommonStoreModule.getAppCommon.isPlaying;
   }
-  // private get totalTime() {
-  //   let totalTime = '0.00';
-  //   if (this.audioRef) {
-  //     this.audioRef.src = appCommonStoreModule.getAppCommon.audioCommon.src;
-  //     this.audioRef.load();
-  //     totalTime = this.transformTime(this.audioRef.duration);
-  //   }
-  //   return totalTime;
-  // }
+
   private mounted() {
-    // this.$store.commit('findDOM', { name: 'audio', dom: this.$refs.audio });
-    // this.$refs.audio.addEventListener('ended', () => { this.next(); });
-    // this.$refs.audio.addEventListener('error', () => { this.next(); });
-    // console.log(
-    //   '%c Powered by Zhaohui - microzz.com',
-    //   'background-image:-webkit-gradient( linear, left top,right top, color-stop(0, #00a419),color-stop(0.15, #f44336), color-stop(0.29, #ff4300),color-stop(0.3, #AA00FF),color-stop(0.4, #8BC34A), color-stop(0.45, #607D8B),color-stop(0.6, #4096EE), color-stop(0.75, #D50000),color-stop(0.9, #4096EE), color-stop(1, #FF1A00));color:transparent;-webkit-background-clip:text;font-size:13px;'
-    // );
     console.log('mounted this.audioRef=' + this.audioRef);
     this.audioRef.src = appCommonStoreModule.getAppCommon.audioCommon.src;
     this.audioRef.load();
@@ -173,9 +142,7 @@ export default class App extends Vue {
       appCommonStoreModule.setAppCommon(appCommon);
     });
   }
-  // private get localAudioTmp() {
-  //   return this.localAudio ? this.localAudio : {};
-  // }
+
   private isShowAsideMenu(): boolean {
     if (appCommonStoreModule.getAppCommon.isShowAsideMenu) {
       return appCommonStoreModule.getAppCommon.isShowAsideMenu;
@@ -192,9 +159,10 @@ export default class App extends Vue {
     appCommonStoreModule.setAppCommon(appCommon);
     !playing ? this.audioRef.pause() : this.audioRef.play();
   }
+  // eslint-disable-next-line
   private changeTime(event: any, progressBarRef: any): void {
     console.log('changeTime');
-    let progressBar: any = progressBarRef;
+    let progressBar = progressBarRef;
     let coordStart = progressBar.getBoundingClientRect().left;
     let coordEnd = event.pageX;
     this.audioRef.currentTime =
@@ -203,12 +171,13 @@ export default class App extends Vue {
     this.now = this.audioRef.currentTime;
     this.audioRef.play();
   }
+  // eslint-disable-next-line
   private touchMove(event: any, progressBarRef: any, nowRef: any): void {
     console.log('touchMove');
-    let progressBar: any = progressBarRef;
-    let coordStart: any = progressBar.getBoundingClientRect().left;
-    let coordEnd: any = event.touches[0].pageX;
-    let nowstyle: any = nowRef;
+    let progressBar = progressBarRef;
+    let coordStart = progressBar.getBoundingClientRect().left;
+    let coordEnd = event.touches[0].pageX;
+    let nowstyle = nowRef;
     if (nowstyle) {
       if (nowstyle.style) {
         nowstyle.style.width =
@@ -217,36 +186,20 @@ export default class App extends Vue {
       }
     }
   }
+  // eslint-disable-next-line
   private touchEnd(event: any, progressBarRef: any): void {
     console.log('touchEnd');
-    let nowstyle: any = progressBarRef;
+    let nowstyle = progressBarRef;
     if (nowstyle) {
       this.audioRef.currentTime =
         (nowstyle.style.width.replace('%', '') / 100) * this.audioRef.duration;
     }
     this.now = this.audioRef.currentTime;
     this.audioRef.play();
-    // this.isPlaying = true;
-    // this.play();
-    //this.$store.commit('play', true);
   }
-  // private get msrc(): string {
-  //   //  if (appCommonStoreModule.getAppCommon.audioCommon.src) {
-  //   //   return appCommonStoreModule.getAppCommon.audioCommon.src;
-  //   // } else {
-  //     return 'http://localhost:8081/song/002.mp3';
-  //   // }
-  // }
   private isPlaying(): boolean {
     return true;
   }
-  // private DOM(): any {
-  //   return this.$store.state.DOM;
-  // }
-
-  // private isShowSearch(): any {
-  //   return this.$store.state.isShowSearch;
-  // }
   private isShowIndex(): boolean {
     return true;
   }

@@ -6,12 +6,13 @@
         :key="index"
         class="music-item"
       >
-         <div>
+        <div @click="toggleMusic(index)">
           <img v-bind:src="baseUrl + item.psrc" class="music-img" />
-          <span @click="toggleMusic(index)" class="music-name">{{
-           index + 1 + '.&nbsp; ' + item.name
-                 }}</span> </div>
-         <span v-on:click="del(index)" class="del-icon"></span>
+          <span class="music-name">{{
+            index + 1 + '.&nbsp; ' + item.name
+          }}</span>
+        </div>
+        <span v-on:click="del(index)" class="del-icon"></span>
       </div>
 
       <div class="tips">没有更多歌曲了～</div>

@@ -42,10 +42,12 @@
           :key="index"
           class="music-item"
         >
-          <img v-bind:src="baseUrl + item.psrc" class="music-img" />
-          <span @click="toggleMusic(index)" class="music-name">{{
-            index + 1 + '.&nbsp; ' + item.name
-          }}</span>
+          <div @click="toggleMusic(index)">
+            <img v-bind:src="baseUrl + item.psrc" class="music-img" />
+            <span class="music-name">{{
+              index + 1 + '.&nbsp; ' + item.name
+            }}</span>
+          </div>
         </div>
 
         <div
@@ -76,7 +78,6 @@ const baseUrl = process.env.VUE_APP_BASE_API;
   name: 'Find',
   components: {},
 })
-/* eslint-disable */
 export default class Find extends Vue {
   private baseUrl: string = baseUrl;
   private songStoreVos: SongStoreVo[] = songStoreModule.getSongs;
@@ -90,17 +91,17 @@ export default class Find extends Vue {
   }
   private mounted() {
     //初始化清空前一次搜索
-    this.songStoreVos=[];
+    this.songStoreVos = [];
   }
 
-  private keywords: string = '';
-  private hotKeywords: any = [];
-  private isShowHot: boolean = true;
-  private musicList: any = [];
-  private playIndex: any = '';
-  private isLoading: any = false;
-  private isShowHistory: any = false;
-  private searchHistory: any =
+  private keywords = '';
+  private hotKeywords = [];
+  private isShowHot = true;
+  private musicList = [];
+  private playIndex = '';
+  private isLoading = false;
+  private isShowHistory = false;
+  private searchHistory =
     (localStorage.searchHistory && JSON.parse(localStorage.searchHistory)) ||
     [];
 
@@ -109,18 +110,17 @@ export default class Find extends Vue {
       this.songStoreVos = [];
       this.isShowHistory = false;
       this.isShowHot = false;
-      this.playIndex = null;
+      this.playIndex = '';
       this.isLoading = true;
-      //  this.$store.commit('showMiniMusic', false);
       this.keywords = keywords;
-      this.songStoreVos=[];
+      this.songStoreVos = [];
       await songStoreModule.exeGetSongsApi(keywords);
       this.songStoreVos = songStoreModule.getSongs;
       this.isLoading = false;
     }
   }
 
- // 点击切换音乐
+  // 点击切换音乐
   private toggleMusic(index: number): void {
     if (this.songStoreVos[index]) {
       let songStoreVo: SongStoreVo = this.songStoreVos[index];
@@ -151,7 +151,7 @@ export default class Find extends Vue {
       this.playVideo(appCommon);
     }
   }
-   private playVideo(appCommon: AppCommon): void {
+  private playVideo(appCommon: AppCommon): void {
     console.log('appCommon.localAudio' + appCommon.localAudio);
     appCommon.localAudio.src =
       appCommonStoreModule.getAppCommon.audioCommon.src;
@@ -176,18 +176,6 @@ export default class Find extends Vue {
     }
   }
 
-  // 搜索结果点击播放音乐
-  // private playMusic(index: any, name: any, src: any, imgSrc: any): void {
-  //   src = 'http://ws.stream.qqmusic.qq.com/' + src + '.m4a?fromtag=46';
-  //   this.$store.commit('playMusic', { name: name, src: src, imgSrc: imgSrc });
-  //   this.$store.commit('addMusic', {
-  //     name: name,
-  //     src: src,
-  //     musicImgSrc: imgSrc,
-  //   });
-  //   this.$store.commit('showMiniMusic', true);
-  //   this.playIndex = index;
-  // }
   private inputFocus() {
     if (this.keywords.trim()) {
       return;
@@ -199,14 +187,14 @@ export default class Find extends Vue {
   }
 
   // 解码
-  private strDecode(str: any): any {
-    return str.replace(
-      /&#(x)?([^&]{1,5});?/g,
-      function ($: any, $1: any, $2: any) {
-        return String.fromCharCode(parseInt($2, $1 ? 16 : 10));
-      }
-    );
-  }
+  // private strDecode(str: any): any {
+  //   return str.replace(
+  //     /&#(x)?([^&]{1,5});?/g,
+  //     function ($: any, $1: any, $2: any) {
+  //       return String.fromCharCode(parseInt($2, $1 ? 16 : 10));
+  //     }
+  //   );
+  // }
 }
 </script>
 
