@@ -24,7 +24,7 @@
       </div>
 
       <!-- 热门搜索 -->
-      <div v-if="songStoreVos.length <= 0" class="hot">
+      <div v-if="songStoreVos.length < 0" class="hot">
         热门搜索
         <div class="keywords">
           <!-- <div
@@ -58,10 +58,13 @@
           清除搜索记录
         </div>
 
-        <div v-show="isLoading" class="loading">
+        <!-- <div v-if="isLoading" class="loading">
           <i class="icon-loading"></i>搜索中...
-        </div>
+        </div> -->
         <div v-show="songStoreVos.length" class="tips">没有更多结果了～</div>
+      </div>
+      <div v-if="isLoading" class="loading">
+        <i class="icon-loading"></i>
       </div>
     </div>
   </transition>
@@ -442,6 +445,24 @@ export default class Find extends Vue {
       }
     }
   }
+  .loading {
+    flex: 20;
+    overflow: auto;
+    padding-top: 5px;
+    text-align: center;
+
+    .icon-loading {
+      display: inline-block;
+      margin: auto;
+      width: 100px;
+      height: 100px;
+      background: url('./loading.gif') no-repeat;
+      background-size: contain;
+      animation: loading 0.6s linear infinite;
+      vertical-align: text-top;
+      margin-right: 10px;
+    }
+  }
 }
 @keyframes listening {
   0% {
@@ -454,4 +475,12 @@ export default class Find extends Vue {
     transform: scale(1);
   }
 }
+// @keyframes loading {
+//   from {
+//     transform: rotate(0);
+//   }
+//   to {
+//     transform: rotate(360deg);
+//   }
+// }
 </style>

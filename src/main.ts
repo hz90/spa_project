@@ -9,10 +9,10 @@ import VueAxios from 'vue-axios';
 // import 'bootstrap/dist/css/bootstrap.css';
 // import 'bootstrap-vue/dist/bootstrap-vue.css';
 import JsEncrypt from 'jsencrypt';
-// import VueLazyload from 'vue-lazyload';
-// Vue.use(VueLazyload, {
-//   loading: require('@/assets/images/default.png'),
-// });
+import VueLazyload from 'vue-lazyload';
+Vue.use(VueLazyload, {
+  loading: require('@/assets/images/default.png'),
+});
 
 Vue.use(VueAxios, axios);
 // Vue.use(BootstrapVue);

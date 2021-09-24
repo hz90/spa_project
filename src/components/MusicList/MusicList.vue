@@ -48,13 +48,6 @@ export default class MusicList extends Vue {
     this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
   }
 
-  // private DOM(): any {
-  //   return this.$store.state.DOM;
-  // }
-  // private isPlaying(): any {
-  //   return this.$store.state.isPlaying;
-  // }
-
   // 点击切换音乐
   private toggleMusic(index: number): void {
     if (this.songStoreVos[index]) {
