@@ -10,13 +10,13 @@
           <img
             @click="showPlay"
             ref="img"
-            v-bind:src="audio.musicImgSrc"
+            v-bind:src="audioCommon.musicImgSrc"
             alt="zhz.com"
           />
         </div>
         <div class="music-name">
           <p @click="showPlay">
-            {{ audio.name }}
+            {{ audioCommon.name }}
           </p>
           <div class="progress">
             <span class="start">{{ transformTime(now) }}</span>
@@ -31,7 +31,7 @@
                 class="now"
                 ref="now"
                 :style="{
-                  width: (now / nativeAudio.duration).toFixed(3) * 100 + '%',
+                  width: (now / audioDuration).toFixed(3) * 100 + '%',
                 }"
               ></div>
             </div>
@@ -50,117 +50,131 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
-import { AppCommon, Audio } from '@/store/vo/app-common';
+// import { AppCommon, Audio } from '@/store/vo/app-common';
+import { Audio } from '@/store/vo/app-common';
 @Component({
   name: 'Footer',
   components: {},
 })
 /* eslint-disable */
 export default class Footer extends Vue {
-  private isPlaying = false;
+  @Prop({ default: false })
+  private isPlaying!: boolean;
+  @Prop({ default: '0.00' })
+  private totalTime!: string;
+  // @PropSync('now')
+  @Prop({ default: 0 })
+  private now!: number;
+  @Prop({ default: {} })
+  private audioCommon!: Audio;
+  @Prop({ default: 0 })
+  private audioDuration!: number;
+  // @Prop({ default: {} })
+  // private localAudio!: HTMLAudioElement;
   private playIcon = 'play-icon';
   private pauseIcon = 'pause-icon';
-  private nativeAudio: any = Object.create(null) as any;
-  private audio: Audio = Object.create(null) as Audio;
+  private nativeAudio: HTMLAudioElement =
+    appCommonStoreModule.getAppCommon.localAudio;
+  //private audio: Audio = Object.create(null) as Audio;
   // private musicSrc: string = appCommonStoreModule.getAppCommon.audioCommon.src;
   private mounted() {
-    this.isPlaying= appCommonStoreModule.getAppCommon.isPlaying;
-    this.nativeAudio = document.querySelector('audio');
-    console.log('Footer mounted'+this.nativeAudio);
-    this.nativeAudio.addEventListener('play', () => {
-      this.totalTime = this.transformTime(this.nativeAudio.duration);
-      this.now = this.nativeAudio.currentTime;
-
-      setInterval(() => {
-        this.now = this.nativeAudio.currentTime;
-      }, 1000);
-    });
-    this.nativeAudio.addEventListener('canplay', () => {
-      this.totalTime = this.transformTime(this.nativeAudio.duration);
-      this.now = this.nativeAudio.currentTime;
-
-      setInterval(() => {
-        this.now = this.nativeAudio.currentTime;
-      }, 1000);
-    });
-    this.audio = this.audioCommon();
-    let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
-    if(!appCommon.localAudio ){
-
-      appCommon.localAudio = this.nativeAudio;
-    }
-    appCommonStoreModule.setAppCommon(appCommon);
+    // console.log('isplaying footer' + this.isPlaying);
+    // if (appCommonStoreModule.getAppCommon.localAudio) {
+    //   this.localAudio = appCommonStoreModule.getAppCommon.localAudio;
+    // }
+    // console.log(this.audioDuration);
+    // this.isPlaying = appCommonStoreModule.getAppCommon.isPlaying;
+    // this.nativeAudio = document.querySelector('audio');
+    // console.log('Footer mounted' + this.nativeAudio);
+    // this.nativeAudio.addEventListener('play', () => {
+    //   this.totalTime = this.transformTime(this.nativeAudio.duration);
+    //   this.now = this.nativeAudio.currentTime;
+    //   setInterval(() => {
+    //     this.now = this.nativeAudio.currentTime;
+    //   }, 1000);
+    // });
+    // this.nativeAudio.addEventListener('canplay', () => {
+    //   this.totalTime = this.transformTime(this.nativeAudio.duration);
+    //   this.now = this.nativeAudio.currentTime;
+    //   setInterval(() => {
+    //     this.now = this.nativeAudio.currentTime;
+    //   }, 1000);
+    // });
+    // this.audio = this.audioCommon();
+    // let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+    // if (!appCommon.localAudio) {
+    //   appCommon.localAudio = this.nativeAudio;
+    // }
+    // appCommonStoreModule.setAppCommon(appCommon);
   }
 
   private isShowMiniMusic(): boolean {
     return true;
   }
-  private audioCommon(): Audio {
-    let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
-    // appCommon.isShowAsideMenu = false;
-    // appCommon.isShowAbout = false;
-    appCommon.isPlaying = false;
-    // appCommon.isShowAsideMenu = false; //显示侧边栏
-    // appCommon.isShowMiniMusic = true; //
-    // appCommon.isShowAbout = false; //显示关于界面
-    console.log('footer init appCommon' + JSON.stringify(appCommon));
-    if (!appCommon.audioCommon) {
-      let audioCommon: Audio = Object.create(null) as Audio;
-      audioCommon.src = 'http://localhost:8081/song/002.mp3';
-      audioCommon.name = 'test';
-      audioCommon.musicImgSrc = 'http://127.0.0.1:8081/img/songPic/HereIam.jpg';
-      audioCommon.index = 0;
-      appCommon.audioCommon = audioCommon;
-    }
-    appCommonStoreModule.setAppCommon(appCommon);
-    return appCommon.audioCommon;
-  }
+  // private audioCommon(): Audio {
+  //   let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+  //   // appCommon.isShowAsideMenu = false;
+  //   // appCommon.isShowAbout = false;
+  //   appCommon.isPlaying = false;
+  //   // appCommon.isShowAsideMenu = false; //显示侧边栏
+  //   // appCommon.isShowMiniMusic = true; //
+  //   // appCommon.isShowAbout = false; //显示关于界面
+  //   console.log('footer init appCommon' + JSON.stringify(appCommon));
+  //   if (!appCommon.audioCommon) {
+  //     let audioCommon: Audio = Object.create(null) as Audio;
+  //     audioCommon.src = 'http://localhost:8081/song/002.mp3';
+  //     audioCommon.name = 'test';
+  //     audioCommon.musicImgSrc = 'http://127.0.0.1:8081/img/songPic/HereIam.jpg';
+  //     audioCommon.index = 0;
+  //     appCommon.audioCommon = audioCommon;
+  //   }
+  //   appCommonStoreModule.setAppCommon(appCommon);
+  //   return appCommon.audioCommon;
+  // }
   private skinColor(): string {
     return this.$store.state.skinColor;
   }
-
-  private now: number = 0;
-  private totalTime: string = '0:00';
   private defaultImg: string = '/assests/images/default.png';
 
-
-  private autoChangeMusic() {
-    console.log('点击音乐发生变更');
-    if (this.audio.src) {
-      console.log('点击音乐发生变更');
-      let isPlaying = appCommonStoreModule.getAppCommon.isPlaying;
-      this.playVideo(isPlaying);
-    }
-  }
-  private playVideo(isPlaying: boolean): void {
-    if (isPlaying) {
-      this.isPlaying = isPlaying;
-      this.nativeAudio.src = appCommonStoreModule.getAppCommon.audioCommon.src;
-      this.nativeAudio.load();
-      // this.nativeAudio.canplay=true;
-      //this.totalTime = this.transformTime(this.nativeAudio.duration);
-      let promise = this.nativeAudio.play();
-      //解决Uncaught (in promise) DOMException: play() failed because the user didn't interact with the document first.
-      if (promise !== undefined) {
-        promise
-          .then(() => {
-            // Autoplay started
-            console.log('Autoplay started');
-          })
-          .catch((error: any) => {
-            console.log(error);
-            // Autoplay was prevented.
-            //this.nativeAudio.muted = true;
-            // this.nativeAudio.play();
-          });
-      }
-    }
-  }
+  // private autoChangeMusic() {
+  //   console.log('点击音乐发生变更');
+  //   if (this.audio.src) {
+  //     console.log('点击音乐发生变更');
+  //     let isPlaying = appCommonStoreModule.getAppCommon.isPlaying;
+  //     this.playVideo(isPlaying);
+  //   }
+  // }
+  // private playVideo(isPlaying: boolean): void {
+  //   if (isPlaying) {
+  //     this.isPlaying = isPlaying;
+  //     this.nativeAudio.src = appCommonStoreModule.getAppCommon.audioCommon.src;
+  //     this.nativeAudio.load();
+  //     // this.nativeAudio.canplay=true;
+  //     //this.totalTime = this.transformTime(this.nativeAudio.duration);
+  //     let promise = this.nativeAudio.play();
+  //     //解决Uncaught (in promise) DOMException: play() failed because the user didn't interact with the document first.
+  //     if (promise !== undefined) {
+  //       promise
+  //         .then(() => {
+  //           // Autoplay started
+  //           console.log('Autoplay started');
+  //         })
+  //         .catch((error: any) => {
+  //           console.log(error);
+  //           // Autoplay was prevented.
+  //           //this.nativeAudio.muted = true;
+  //           // this.nativeAudio.play();
+  //         });
+  //     }
+  //   }
+  // }
   private play(): void {
-    this.isPlaying = !this.isPlaying;
-    !this.isPlaying ? this.nativeAudio.pause() : this.nativeAudio.play();
+    console.log('called fatherMethod');
+    // this.isPlaying = !this.isPlaying;
+    // !this.isPlaying ? this.nativeAudio.pause() : this.nativeAudio.play();
+    this.$emit('fatherMethod');
   }
   private showPlay(): void {
     // if (this.isShowAsideMenu()) {
@@ -170,45 +184,59 @@ export default class Footer extends Vue {
     // this.$store.commit('showMiniMusic', false);
   }
   private changeTime(event: any): void {
-    console.log('changeTime');
-    let progressBar: any = this.$refs.progressBar;
-    let coordStart = progressBar.getBoundingClientRect().left;
-    let coordEnd = event.pageX;
-    this.nativeAudio.currentTime =
-      ((coordEnd - coordStart) / progressBar.offsetWidth) *
-      this.nativeAudio.duration;
-    this.now = this.nativeAudio.currentTime;
-    this.nativeAudio.play();
-    this.isPlaying = true;
+    let progressBaRefr: any = this.$refs.progressBar;
+    this.$emit('fatherMethodChangeTime', event, progressBaRefr);
   }
   private touchMove(event: any): void {
-    console.log('touchMove');
-    let progressBar: any = this.$refs.progressBar;
-    let coordStart: any = progressBar.getBoundingClientRect().left;
-    let coordEnd: any = event.touches[0].pageX;
-    let nowstyle: any = this.$refs.now;
-    if (nowstyle) {
-      if (nowstyle.style) {
-        nowstyle.style.width =
-          ((coordEnd - coordStart) / progressBar.offsetWidth.toFixed(3)) * 100 +
-          '%';
-      }
-    }
+    let progressBaRefr: any = this.$refs.progressBar;
+    let nowRef: any = this.$refs.now;
+    this.$emit('fatherMethodTouchMove', progressBaRefr,nowRef);
   }
   private touchEnd(event: any): void {
-    console.log('touchEnd');
-    let nowstyle: any = this.$refs.now;
-    if (nowstyle) {
-      this.nativeAudio.currentTime =
-        (nowstyle.style.width.replace('%', '') / 100) *
-        this.nativeAudio.duration;
-    }
-    this.now = this.nativeAudio.currentTime;
-    this.nativeAudio.play();
-    this.isPlaying = true;
-    // this.play();
-    //this.$store.commit('play', true);
+    let progressBaRefr: any = this.$refs.now;
+    this.$emit('fatherMethodTouchEnd', progressBaRefr);
   }
+  // private changeTime(event: any): void {
+  //   console.log('changeTime');
+  //   let nativeAudio = appCommonStoreModule.getAppCommon.localAudio;
+  //   let progressBar: any = this.$refs.progressBar;
+  //   let coordStart = progressBar.getBoundingClientRect().left;
+  //   let coordEnd = event.pageX;
+  //   nativeAudio.currentTime =
+  //     ((coordEnd - coordStart) / progressBar.offsetWidth) *
+  //     nativeAudio.duration;
+  //   this.now = nativeAudio.currentTime;
+  //   nativeAudio.play();
+  //   this.isPlaying = true;
+  // }
+  // private touchMove(event: any): void {
+  //   console.log('touchMove');
+  //   let progressBar: any = this.$refs.progressBar;
+  //   let coordStart: any = progressBar.getBoundingClientRect().left;
+  //   let coordEnd: any = event.touches[0].pageX;
+  //   let nowstyle: any = this.$refs.now;
+  //   if (nowstyle) {
+  //     if (nowstyle.style) {
+  //       nowstyle.style.width =
+  //         ((coordEnd - coordStart) / progressBar.offsetWidth.toFixed(3)) * 100 +
+  //         '%';
+  //     }
+  //   }
+  // }
+  // private touchEnd(event: any): void {
+  //   console.log('touchEnd');
+  //   let nativeAudio = appCommonStoreModule.getAppCommon.localAudio;
+  //   let nowstyle: any = this.$refs.now;
+  //   if (nowstyle) {
+  //     nativeAudio.currentTime =
+  //       (nowstyle.style.width.replace('%', '') / 100) * nativeAudio.duration;
+  //   }
+  //   this.now = nativeAudio.currentTime;
+  //   nativeAudio.play();
+  //   this.isPlaying = true;
+  //   // this.play();
+  //   //this.$store.commit('play', true);
+  // }
   private transformTime(seconds: any): any {
     let m: any, s: any;
     m = Math.floor(seconds / 60);

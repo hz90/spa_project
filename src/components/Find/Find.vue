@@ -133,10 +133,10 @@ export default class Find extends Vue {
         console.log(
           '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
         );
-        if (!appCommon.isPlaying) {
-          appCommon.isPlaying = true;
-          appCommonStoreModule.setAppCommon(appCommon);
-        }
+        // if (!appCommon.isPlaying) {
+        //   appCommon.isPlaying = true;
+        //   appCommonStoreModule.setAppCommon(appCommon);
+        // }
         return;
       }
       console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));

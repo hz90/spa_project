@@ -6,11 +6,12 @@
         :key="index"
         class="music-item"
       >
-        <img v-bind:src="baseUrl + item.psrc" class="music-img" />
-        <span @click="toggleMusic(index)" class="music-name">{{
-          index + 1 + '.&nbsp; ' + item.name
-        }}</span>
-        <span v-on:click="del(index)" class="del-icon"></span>
+         <div>
+          <img v-bind:src="baseUrl + item.psrc" class="music-img" />
+          <span @click="toggleMusic(index)" class="music-name">{{
+           index + 1 + '.&nbsp; ' + item.name
+                 }}</span> </div>
+         <span v-on:click="del(index)" class="del-icon"></span>
       </div>
 
       <div class="tips">没有更多歌曲了～</div>
@@ -32,25 +33,6 @@ const baseUrl = process.env.VUE_APP_BASE_API;
 })
 export default class MusicList extends Vue {
   private baseUrl: string = baseUrl;
-  private initAppCommon() {
-    let appCommon: AppCommon = Object.create(null) as AppCommon;
-    appCommon.isShowAsideMenu = false;
-    appCommon.isShowAbout = false;
-    appCommon.isPlaying = false;
-    // appCommon.isShowAsideMenu = false; //显示侧边栏
-    // appCommon.isShowMiniMusic = true; //
-    // appCommon.isShowAbout = false; //显示关于界面
-    let audioCommon: Audio = Object.create(null) as Audio;
-    audioCommon.src = 'http://localhost:8081/song/002.mp3';
-    audioCommon.name = 'test';
-    audioCommon.musicImgSrc = 'http://127.0.0.1:8081/img/songPic/HereIam.jpg';
-    audioCommon.index = 0;
-    appCommon.audioCommon = audioCommon;
-    if (appCommonStoreModule.getAppCommon.localAudio) {
-      appCommon.localAudio = appCommonStoreModule.getAppCommon.localAudio;
-    }
-    appCommonStoreModule.setAppCommon(appCommon);
-  }
   private songStoreVos: SongStoreVo[] = [];
   private beforeCreate() {
     // this.$store.commit('showMiniMusic', true);
@@ -58,7 +40,7 @@ export default class MusicList extends Vue {
 
   private async beforeMount() {
     // if (!appCommonStoreModule.getAppCommon) {
-    this.initAppCommon();
+    // this.initAppCommon();
     // }
     console.log('execute MusicList');
     await myClollectSongStoreModule.exeGetMySongsApi();
@@ -85,10 +67,10 @@ export default class MusicList extends Vue {
         console.log(
           '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
         );
-        if (!appCommon.isPlaying) {
-          appCommon.isPlaying = true;
-          appCommonStoreModule.setAppCommon(appCommon);
-        }
+        // if (!appCommon.isPlaying) {
+        //   appCommon.isPlaying = true;
+        //   appCommonStoreModule.setAppCommon(appCommon);
+        // }
         return;
       }
       console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
