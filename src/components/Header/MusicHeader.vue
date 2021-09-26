@@ -43,7 +43,7 @@ export default class MusicHeader extends Vue {
   }
   private toSocial(): void {
     this.linkBorderIndex = 3;
-    this.$router.push('/social');
+    this.$router.push('/login');
   }
   private showAsideMenu(): void {
     let appCommon: AppCommon = appCommonStoreModule.getAppCommon;

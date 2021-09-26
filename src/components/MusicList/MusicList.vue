@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
+// import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
 import { SongStoreVo } from '@/store/vo/music-song-vo';
 
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
@@ -43,11 +43,19 @@ export default class MusicList extends Vue {
     // if (!appCommonStoreModule.getAppCommon) {
     // this.initAppCommon();
     // }
-    console.log('execute MusicList');
-    await myClollectSongStoreModule.exeGetMySongsApi();
-    this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
+    // console.log('execute MusicList');
+    // await myClollectSongStoreModule.exeGetMySongsApi();
+    // this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
   }
 
+  private async mounted() {
+    // if (!appCommonStoreModule.getAppCommon) {
+    // this.initAppCommon();
+    // }
+    // console.log('execute MusicList');
+    // await myClollectSongStoreModule.exeGetMySongsApi();
+    // this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
+  }
   // 点击切换音乐
   private toggleMusic(index: number): void {
     if (this.songStoreVos[index]) {

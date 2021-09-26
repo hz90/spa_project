@@ -8,6 +8,7 @@ import {
 import store from '@/store';
 import { loginStoreVo } from '../vo/login-store-vo';
 import ApiService from '@/api/serviceBase';
+import auth from '@/config/auth';
 // 参数一：module名称，开启命名空间后会以name为命名空间
 // 参数二：是否使用动态加载，简而言之只有在用到当前的module才会加载，详细可以看vuex官网。本篇博客必须选择true，
 //        这也是为什么index.ts一直不用修改的原因，如果设置为false会有很大的变动，如果您真的需要这么做，可以自己研究一下，
@@ -35,15 +36,20 @@ class loginStore extends VuexModule {
   public async executeLoginApi(loginStoreVo: loginStoreVo): Promise<void> {
     const response = await ApiService.Post('/login', loginStoreVo);
     console.log(response);
+    if (response.data.data.errorInfo) {
+      console.log(response);
+    } else {
+      this.setTokenToStore(response.data.data.data);
+    }
   }
 
   /**
    *
-   * @param name
+   * @param token
    */
   @Mutation
-  private setTokenToStore(name: string) {
-    this.name = name;
+  private setTokenToStore(token: string) {
+    auth.setToken(token);
   }
 
   public get getName(): string {

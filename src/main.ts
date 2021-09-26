@@ -13,10 +13,11 @@ import VueLazyload from 'vue-lazyload';
 Vue.use(VueLazyload, {
   loading: require('@/assets/images/default.png'),
 });
-
+import { BToast, ToastPlugin } from 'bootstrap-vue';
+Vue.component('b-toast', BToast);
 Vue.use(VueAxios, axios);
 // Vue.use(BootstrapVue);
-// Vue.use(ToastPlugin);
+Vue.use(ToastPlugin);
 // Vue.use(BootstrapVueIcons);
 Vue.config.productionTip = false;
 Vue.prototype.jsEncrypt = JsEncrypt;

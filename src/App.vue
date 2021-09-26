@@ -104,7 +104,6 @@ export default class App extends Vue {
     appCommon.localAudio = this.audioRef;
     if (!appCommon.localAudio) {
       appCommon.localAudio = this.audioRef;
-      appCommon.localAudio = this.audioRef;
     }
     appCommonStoreModule.setAppCommon(appCommon);
     console.log(
@@ -119,7 +118,7 @@ export default class App extends Vue {
   private mounted() {
     console.log('mounted this.audioRef=' + this.audioRef);
     this.audioRef.src = appCommonStoreModule.getAppCommon.audioCommon.src;
-    this.audioRef.load();
+    //this.audioRef.load();
     this.audioRef.addEventListener('play', () => {
       this.totalTime = this.transformTime(this.audioRef.duration);
       this.now = this.audioRef.currentTime;
@@ -139,6 +138,7 @@ export default class App extends Vue {
       this.localAudio = this.audioRef;
       let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
       appCommon.localAudio = this.audioRef;
+      // appCommon.isPlaying = false;
       appCommonStoreModule.setAppCommon(appCommon);
     });
   }

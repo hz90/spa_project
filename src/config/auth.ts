@@ -19,6 +19,7 @@ export default {
     }
   },
   setToken(token: string): void {
+    console.log('token is====' + token);
     return localStorage.setItem(TokenKey, token);
   },
   removeToken(): void {

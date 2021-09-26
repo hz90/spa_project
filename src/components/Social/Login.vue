@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="login-wrap">
-    <div class="login-html">
+    <div v-if="!isLoading && !error && !success" class="login-html">
       <input id="tab-1" type="radio" name="tab" class="sign-in" checked /><label
         for="tab-1"
         class="tab"
@@ -15,11 +15,23 @@
         <div class="sign-in-htm">
           <div class="group">
             <label for="user" class="label">Username</label>
-            <input id="user" type="text" class="input" required="" />
+            <input
+              v-model="username"
+              id="user"
+              type="text"
+              class="input"
+              required=""
+            />
           </div>
           <div class="group">
             <label for="pass" class="label">Password</label>
-            <input id="pass" type="password" class="input" required="" />
+            <input
+              v-model="password"
+              id="pass"
+              type="password"
+              class="input"
+              required=""
+            />
           </div>
           <div class="group">
             <input id="check" type="checkbox" class="check" checked />
@@ -43,13 +55,12 @@
         <div class="sign-up-htm">
           <div class="group">
             <label for="user" class="label">Username</label>
-            <input v-model="username" id="user" type="text" class="input" />
+            <input id="user" type="text" class="input" />
           </div>
           <div class="group">
             <label for="pass" class="label">Password</label>
             <input
               id="pass"
-              v-model="password"
               type="password"
               class="input"
               data-type="password"
@@ -74,6 +85,31 @@
         </div>
       </div>
     </div>
+    <div v-if="error">
+      <!-- <b-toast id="example-toast" title="信息提示" static no-auto-hide>
+        登录触发错误！！！！
+        <BR />
+        {{ error }}
+      </b-toast> -->
+      <span>
+        登录出现错误！！！！
+        <BR />
+        {{ error }}</span
+      >
+      <BR />
+      <button @click="goLogin()">重新登录</button>
+    </div>
+    <div v-if="success">
+      登录成功
+      <br />
+      <button @click="goLogin()">重新登录</button>
+    </div>
+    <div v-if="isLoading" class="loading">
+      <i class="icon-loading"></i>
+    </div>
+    <!-- <div v-if="isLoading" class="loading">
+      <span></span>
+    </div> -->
   </div>
 </template>
 
@@ -82,13 +118,17 @@ import { Component, Vue } from 'vue-property-decorator';
 import { loginModule } from '@/store/modules/login-store';
 import { publicKeyStoreModule } from '@/store/modules/publickey-store';
 import { loginStoreVo } from '@/store/vo/login-store-vo';
+import auth from '@/config/auth';
 @Component({
-  name: 'Social',
+  name: 'Login',
   components: {},
 })
-export default class Social extends Vue {
+export default class Login extends Vue {
+  private isLoading = false;
   private username = '';
   private password = '';
+  private error = '';
+  private success = false;
   private beforeCreate() {
     // this.$store.commit('showMiniMusic', false);
   }
@@ -96,16 +136,40 @@ export default class Social extends Vue {
     // this.getOne();
   }
   private mounted() {
-    // this.$store.commit('changeLinkBorderIndex', 3);
+    this.success = auth.getToken() ? true : false;
   }
   public async login(): Promise<void> {
+    this.isLoading = true;
+
     await publicKeyStoreModule.exeGetPublicKeyApi();
     console.log('publickey:' + publicKeyStoreModule.getMypublicKey);
     let loginStoreVo: loginStoreVo = {
       username: this.username,
       password: this.password,
     };
-    await loginModule.executeLoginApi(loginStoreVo);
+    await loginModule
+      .executeLoginApi(loginStoreVo)
+      .then(() => {
+        this.isLoading = false;
+        this.success = true;
+      })
+      // eslint-disable-next-line
+      .catch((error: any) => {
+        this.error = JSON.stringify(error.data);
+        this.$bvToast.show('example-toast');
+        this.isLoading = false;
+        console.log('bbbbb' + error);
+      })
+      .finally(() => {
+        this.isLoading = false;
+        console.log('aa');
+      });
+  }
+  private goLogin(): void {
+    this.error = '';
+    this.success = false;
+    auth.removeToken();
+    this.$router.push('/login');
   }
 }
 </script>
@@ -121,6 +185,59 @@ export default class Social extends Vue {
   box-shadow: 0 12px 15px 0 rgba(0, 0, 0, 0.24),
     0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
+.loading {
+  padding-top: 10px;
+  text-align: center;
+
+  .icon-loading {
+    display: inline-block;
+    margin: auto;
+    width: 100px;
+    height: 100px;
+    background: url('./loading.gif') no-repeat;
+    background-size: contain;
+    animation: loading 0.6s linear infinite;
+    vertical-align: text-top;
+    margin-right: 10px;
+  }
+}
+// .loading {
+//   width: 150px;
+//   height: 8px;
+//   border-radius: 4px;
+//   margin: 0 auto;
+//   margin-top: 100px;
+//   position: relative;
+//   background: lightblue;
+//   overflow: hidden;
+// }
+// .loading span {
+//   display: block;
+//   width: 100%;
+//   height: 100%;
+//   border-radius: 3px;
+//   background: lightgreen;
+//   animation: loading 0.6s linear infinite;
+// }
+// @keyframes loading {
+//   0% {
+//     -webkit-transform: translate(-150px);
+//   }
+//   50% {
+//     -webkit-transform: translate(0);
+//   }
+//   100% {
+//     -webkit-transform: translate(150px);
+//   }
+// }
+// @keyframes loading {
+//   from {
+//     transform: rotate(0);
+//   }
+//   to {
+//     transform: rotate(360deg);
+//   }
+// }
 .login-html {
   width: 100%;
   height: 100%;
@@ -186,7 +303,7 @@ export default class Social extends Vue {
   background: rgba(255, 255, 255, 0.1);
 }
 .login-form .group input[data-type='password'] {
-  text-security: circle;
+  //text-security: circle;
   -webkit-text-security: circle;
 }
 .login-form .group .label {

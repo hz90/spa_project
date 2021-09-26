@@ -3,10 +3,10 @@ import VueRouter, { RouteConfig } from 'vue-router';
 
 import Router from 'vue-router';
 // import Home from '../views/Home.vue';
-import login from '../views/login/LoginVue.vue';
+// import login from '../views/login/LoginVue.vue';
 import Find from '../components/Find/Find.vue';
 import MusicList from '../components/MusicList/MusicList.vue';
-import Social from '../components/Social/Social.vue';
+import Login from '../components/Social/Login.vue';
 
 /**
  * 重写路由的push方法
@@ -53,9 +53,9 @@ const routes: Array<RouteConfig> = [
     component: Find,
   },
   {
-    path: '/social',
-    name: 'Social',
-    component: Social,
+    path: '/login',
+    name: 'Login',
+    component: Login
   },
   {
     path: '/about',
@@ -66,14 +66,14 @@ const routes: Array<RouteConfig> = [
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/About.vue'),
   },
-  {
-    path: '/login',
-    name: 'Login',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: login,
-  },
+  // {
+  //   path: '/login',
+  //   name: 'Login',
+  //   // route level code-splitting
+  //   // this generates a separate chunk (about.[hash].js) for this route
+  //   // which is lazy-loaded when the route is visited.
+  //   component: login,
+  // },
 ];
 
 const router = new VueRouter({
