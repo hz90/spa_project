@@ -39,7 +39,7 @@ class loginStore extends VuexModule {
     if (response.data.data.errorInfo) {
       console.log(response);
     } else {
-      this.setTokenToStore(response.data.data.data);
+      this.setTokenToStore(response.data.data);
     }
   }
 

@@ -102,6 +102,7 @@ instance.interceptors.request.use(
     }
 
     const token = auth.getToken();
+    config.headers.token_header = token;
     token && (config.headers.Authorization = token);
     return config;
   },

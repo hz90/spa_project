@@ -97,12 +97,12 @@
         {{ error }}</span
       >
       <BR />
-      <button @click="goLogin()">重新登录</button>
+      <b-button variant="primary" @click="goLogin()">重新登录</b-button>
     </div>
     <div v-if="success">
       登录成功
       <br />
-      <button @click="goLogin()">重新登录</button>
+      <b-button variant="primary" @click="goLogin()">重新登录</b-button>
     </div>
     <div v-if="isLoading" class="loading">
       <i class="icon-loading"></i>

@@ -10,7 +10,9 @@
     "lint": "eslint --ext .js,.ts,.tsx test/ src/"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "axios": "^0.21.3",
+    "babel-polyfill": "^6.26.0",
     "better-scroll": "^2.4.2",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",

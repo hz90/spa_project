@@ -22,49 +22,50 @@
           </div>
         </div>
       </div>
-
-      <!-- 热门搜索 -->
-      <div v-if="songStoreVos.length < 0" class="hot">
-        热门搜索
-        <div class="keywords">
-          <!-- <div
+      <div v-if="isLoading" class="loading">
+        <i class="icon-loading"></i>
+      </div>
+      <div v-else>
+        <!-- 热门搜索 -->
+        <div v-if="songStoreVos.length < 0" class="hot">
+          热门搜索
+          <div class="keywords">
+            <!-- <div
             v-for="item of hotKeywords"
             v-text="item"
             @click="toSearch(item)"
             class="keyword"
           ></div> -->
-        </div>
-      </div>
-      <!-- @touchmove="$store.commit('showMiniMusic', false)" -->
-      <div v-else class="search-list">
-        <div
-          v-for="(item, index) of songStoreVos"
-          :key="index"
-          class="music-item"
-        >
-          <div @click="toggleMusic(index)">
-            <img v-bind:src="baseUrl + item.psrc" class="music-img" />
-            <span class="music-name">{{
-              index + 1 + '.&nbsp; ' + item.name
-            }}</span>
           </div>
         </div>
+        <!-- @touchmove="$store.commit('showMiniMusic', false)" -->
+        <div v-else class="search-list">
+          <div
+            v-for="(item, index) of songStoreVos"
+            :key="index"
+            class="music-item"
+          >
+            <div @click="toggleMusic(index)">
+              <img v-bind:src="item.psrc" class="music-img" />
+              <span class="music-name">{{
+                index + 1 + '.&nbsp; ' + item.name
+              }}</span>
+            </div>
+          </div>
 
-        <div
-          v-show="isShowHistory && searchHistory.length"
-          @click="searchHistory = []"
-          class="tips"
-        >
-          清除搜索记录
-        </div>
+          <div
+            v-show="isShowHistory && searchHistory.length"
+            @click="searchHistory = []"
+            class="tips"
+          >
+            清除搜索记录
+          </div>
 
-        <!-- <div v-if="isLoading" class="loading">
+          <!-- <div v-if="isLoading" class="loading">
           <i class="icon-loading"></i>搜索中...
         </div> -->
-        <div v-show="songStoreVos.length" class="tips">没有更多结果了～</div>
-      </div>
-      <div v-if="isLoading" class="loading">
-        <i class="icon-loading"></i>
+          <div v-show="songStoreVos.length" class="tips">没有更多结果了～</div>
+        </div>
       </div>
     </div>
   </transition>
@@ -73,9 +74,14 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { songStoreModule } from '@/store/modules/song-store';
-import { SongStoreVo } from '@/store/vo/music-song-vo';
+import { SongStoreVo, SongRequestVo } from '@/store/vo/music-song-vo';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon, Audio } from '@/store/vo/app-common';
+import { songDetailStoreModule } from '@/store/modules/song-detail-store';
+import {
+  SongDetailStoreVo,
+  SongDetailRequestVo,
+} from '@/store/vo/music-song-detail-vo';
 const baseUrl = process.env.VUE_APP_BASE_API;
 @Component({
   name: 'Find',
@@ -94,7 +100,7 @@ export default class Find extends Vue {
   }
   private mounted() {
     //初始化清空前一次搜索
-    this.songStoreVos = [];
+    // this.songStoreVos = [];
   }
 
   private keywords = '';
@@ -117,25 +123,30 @@ export default class Find extends Vue {
       this.isLoading = true;
       this.keywords = keywords;
       this.songStoreVos = [];
-      await songStoreModule.exeGetSongsApi(keywords);
+      let songRequestVo: SongRequestVo = {
+        name: keywords,
+      };
+      await songStoreModule.exeGetSongsApi(songRequestVo);
       this.songStoreVos = songStoreModule.getSongs;
       this.isLoading = false;
     }
   }
 
   // 点击切换音乐
-  private toggleMusic(index: number): void {
+  private async toggleMusic(index: number): Promise<void> {
+    this.isLoading = true;
     if (this.songStoreVos[index]) {
       let songStoreVo: SongStoreVo = this.songStoreVos[index];
       //点击相同的音乐直接返回
       let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
       if (
-        appCommonStoreModule.getAppCommon.audioCommon.src ===
-        'http://localhost:8081' + songStoreVo.msrc
+        !songStoreVo.msrc ||
+        appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.msrc
       ) {
         console.log(
           '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
         );
+        this.isLoading = false;
         // if (!appCommon.isPlaying) {
         //   appCommon.isPlaying = true;
         //   appCommonStoreModule.setAppCommon(appCommon);
@@ -144,9 +155,25 @@ export default class Find extends Vue {
       }
       console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
       let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
-      audioCommon.src = 'http://localhost:8081' + songStoreVo.msrc;
+
+      //获取音乐详细信息
+      this.songStoreVos[index].msrc = await this.getMusicDetail(
+        this.songStoreVos[index]
+      );
+
+      if (songStoreVo.msrc.indexOf('https') > -1) {
+        console.log('cloud music');
+        audioCommon.src = songStoreVo.msrc;
+      } else {
+        audioCommon.src = 'http://localhost:8081' + songStoreVo.msrc;
+      }
       audioCommon.name = songStoreVo.name;
-      audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      if (songStoreVo.psrc.indexOf('https') > -1) {
+        console.log('cloud music');
+        audioCommon.musicImgSrc = songStoreVo.psrc;
+      } else {
+        audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      }
       audioCommon.index = 0;
       appCommon.audioCommon = audioCommon;
       appCommon.isPlaying = true;
@@ -176,6 +203,24 @@ export default class Find extends Vue {
           //this.nativeAudio.muted = true;
           // this.nativeAudio.play();
         });
+    }
+    this.isLoading = false;
+  }
+
+  private async getMusicDetail(songStoreVos: SongStoreVo): Promise<string> {
+    let songDetailRequestVo: SongDetailRequestVo = Object.create(
+      null
+    ) as SongDetailRequestVo;
+    songDetailRequestVo = Object.assign(songDetailRequestVo, songStoreVos);
+    let songDetailRequestVos: SongDetailRequestVo[] = [];
+    songDetailRequestVos.push(songDetailRequestVo);
+    await songDetailStoreModule.exeGetSongsDetailApi(songDetailRequestVos);
+    let songDetailStoreVo: SongDetailStoreVo[] =
+      songDetailStoreModule.getSongsDetail;
+    if (songDetailStoreVo && songDetailStoreVo.length > 0) {
+      return songDetailStoreVo[0].msrc;
+    } else {
+      return '';
     }
   }
 

@@ -2,6 +2,10 @@
 const target = process.env.APP_API_URL;
 
 module.exports = {
+  // chainWebpack(config) {
+  //   // 在chainWebpack中添加下面的代码
+  //   config.entry('main.ts').add('babel-polyfill'); // main是入口js文件
+  // },
   devServer: {
     overlay: {
       warnings: true,

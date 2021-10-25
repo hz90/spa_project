@@ -82,13 +82,13 @@ const router = new VueRouter({
 /*
         全局守卫
         */
-router.beforeEach((to, from, next) => {
-  console.log('全局前置守卫');
-  next();
-});
-router.afterEach((to, from) => {
-  console.log('全局后置守卫');
-});
+// router.beforeEach((to, from, next) => {
+//   console.log('全局前置守卫');
+//   next();
+// });
+// router.afterEach((to, from) => {
+//   console.log('全局后置守卫');
+// });
 //  // 路由独享守卫
 //  {path:"/user",component:User,beforeEnter: (to:Route, from:Route, next:Function) => {
 //   console.log("路由独享前置守卫")

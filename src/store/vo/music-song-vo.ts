@@ -6,3 +6,6 @@ export interface SongStoreVo {
   psrc: string; //图片地址
   msrc: string; //音乐地址
 }
+export interface SongRequestVo {
+  name: string; //keyword
+}
