@@ -9,18 +9,18 @@
           <!-- </a> -->
           <div class="about">
             <span class="name"><a href="#">zhz</a></span>
-            <span class="level">Lv100</span>
+            <!-- <span class="level">Lv100</span>
             <span @click="isSignIn = true" class="sign">
               <i></i>
               {{ isSignIn ? '已签到' : '签到' }}
-            </span>
+            </span> -->
           </div>
         </div>
 
         <div class="settings">
           <div class="content">
             <ul>
-              <li><i class="icon-msg"></i>我的消息</li>
+              <!--  <li><i class="icon-msg"></i>我的消息</li>
               <li><i class="icon-vip"></i>会员中心</li>
               <li><i class="icon-shop"></i>商城</li>
               <li><i class="icon-music"></i>在线听歌免流量</li>
@@ -32,7 +32,7 @@
             <ul>
               <li @click.stop.prevent="$store.commit('showIndex', false)">
                 <i class="icon-skin"></i>个性换肤
-              </li>
+              </li> -->
               <li @click="showAbout"><i class="aboutme"></i>关于</li>
             </ul>
             <div class="back">

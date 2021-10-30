@@ -9,7 +9,7 @@ export interface AppCommon {
   isShowMiniMusic: boolean; //
   isShowAbout: boolean; //显示关于界面
   audioCommon: Audio; //播放音乐
-  localAudio:HTMLAudioElement ;//当前audio对象
+  localAudio: HTMLAudioElement; //当前audio对象
 }
 
 export interface Audio {

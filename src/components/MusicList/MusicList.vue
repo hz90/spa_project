@@ -1,13 +1,16 @@
 <template lang="html">
   <transition name="showRouter">
-    <div class="music-list">
+    <div v-if="isLoading" class="loading">
+      <i class="icon-loading"></i>
+    </div>
+    <div v-else class="music-list">
       <div
         v-for="(item, index) of songStoreVos"
         :key="index"
         class="music-item"
       >
         <div @click="toggleMusic(index)">
-          <img v-bind:src="baseUrl + item.psrc" class="music-img" />
+          <img v-bind:src="item.psrc" class="music-img" />
           <span class="music-name">{{
             index + 1 + '.&nbsp; ' + item.name
           }}</span>
@@ -22,11 +25,16 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-// import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
+import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
 import { SongStoreVo } from '@/store/vo/music-song-vo';
 
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon, Audio } from '@/store/vo/app-common';
+import { songDetailStoreModule } from '@/store/modules/song-detail-store';
+import {
+  SongDetailStoreVo,
+  SongDetailRequestVo,
+} from '@/store/vo/music-song-detail-vo';
 const baseUrl = process.env.VUE_APP_BASE_API;
 @Component({
   name: 'MusicList',
@@ -34,7 +42,9 @@ const baseUrl = process.env.VUE_APP_BASE_API;
 })
 export default class MusicList extends Vue {
   private baseUrl: string = baseUrl;
-  private songStoreVos: SongStoreVo[] = [];
+  private songStoreVos: SongStoreVo[] =
+    myClollectSongStoreModule.getMyCollectSongs;
+  private isLoading = false;
   private beforeCreate() {
     // this.$store.commit('showMiniMusic', true);
   }
@@ -54,21 +64,22 @@ export default class MusicList extends Vue {
     // }
     // console.log('execute MusicList');
     // await myClollectSongStoreModule.exeGetMySongsApi();
-    // this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
+    this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
   }
   // 点击切换音乐
-  private toggleMusic(index: number): void {
+  private async toggleMusic(index: number): Promise<void> {
+    this.isLoading = true;
     if (this.songStoreVos[index]) {
       let songStoreVo: SongStoreVo = this.songStoreVos[index];
       //点击相同的音乐直接返回
       let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
       if (
-        appCommonStoreModule.getAppCommon.audioCommon.src ===
-        'http://localhost:8081' + songStoreVo.msrc
+        appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.tmpsrc
       ) {
         console.log(
           '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
         );
+        this.isLoading = false;
         // if (!appCommon.isPlaying) {
         //   appCommon.isPlaying = true;
         //   appCommonStoreModule.setAppCommon(appCommon);
@@ -77,9 +88,25 @@ export default class MusicList extends Vue {
       }
       console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
       let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
-      audioCommon.src = 'http://localhost:8081' + songStoreVo.msrc;
+
+      //获取音乐详细信息
+      this.songStoreVos[index].tmpsrc = await this.getMusicDetail(
+        this.songStoreVos[index]
+      );
+
+      if (songStoreVo.tmpsrc.indexOf('https') > -1) {
+        console.log('cloud music');
+        audioCommon.src = songStoreVo.tmpsrc;
+      } else {
+        audioCommon.src = 'http://localhost:8081' + songStoreVo.tmpsrc;
+      }
       audioCommon.name = songStoreVo.name;
-      audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      if (songStoreVo.psrc.indexOf('https') > -1) {
+        console.log('cloud music');
+        audioCommon.musicImgSrc = songStoreVo.psrc;
+      } else {
+        audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      }
       audioCommon.index = 0;
       appCommon.audioCommon = audioCommon;
       appCommon.isPlaying = true;
@@ -100,7 +127,7 @@ export default class MusicList extends Vue {
       promise
         .then(() => {
           // Autoplay started
-          console.log('Autoplay started music');
+          console.log('Autoplay started music find');
         })
         // eslint-disable-next-line
         .catch((error: any) => {
@@ -110,10 +137,32 @@ export default class MusicList extends Vue {
           // this.nativeAudio.play();
         });
     }
+    this.isLoading = false;
+  }
+
+  private async getMusicDetail(songStoreVos: SongStoreVo): Promise<string> {
+    let songDetailRequestVo: SongDetailRequestVo = Object.create(
+      null
+    ) as SongDetailRequestVo;
+    songDetailRequestVo = Object.assign(songDetailRequestVo, songStoreVos);
+    let songDetailRequestVos: SongDetailRequestVo[] = [];
+    songDetailRequestVos.push(songDetailRequestVo);
+    await songDetailStoreModule.exeGetSongsDetailApi(songDetailRequestVos);
+    let songDetailStoreVo: SongDetailStoreVo[] =
+      songDetailStoreModule.getSongsDetail;
+    if (songDetailStoreVo && songDetailStoreVo.length > 0) {
+      return songDetailStoreVo[0].tmpsrc;
+    } else {
+      return '';
+    }
   }
   // 删除音乐
   private del(index: number): void {
-    this.$store.commit('del', index);
+    if (this.songStoreVos[index]) {
+      let songStoreVo: SongStoreVo = this.songStoreVos[index];
+      myClollectSongStoreModule.exeDelSongfromMyCollectApi(songStoreVo);
+      this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
+    }
   }
 }
 </script>
@@ -186,6 +235,36 @@ export default class MusicList extends Vue {
     width: 200px;
     font-size: 80%;
     color: gray;
+  }
+}
+.loading {
+  flex: 20;
+  overflow: auto;
+  padding-top: 5px;
+  text-align: center;
+
+  .icon-loading {
+    display: inline-block;
+    margin: auto;
+    width: 100px;
+    height: 100px;
+    background: url('./loading.gif') no-repeat;
+    background-size: contain;
+    animation: loading 0.6s linear infinite;
+    vertical-align: text-top;
+    margin-right: 10px;
+  }
+}
+
+@keyframes listening {
+  0% {
+    transform: scale(1);
+  }
+  33% {
+    transform: scale(1.3);
+  }
+  66% {
+    transform: scale(1);
   }
 }
 </style>

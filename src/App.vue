@@ -98,6 +98,8 @@ export default class App extends Vue {
     appCommon.isPlaying = false; //显示bofang
     let audioCommon: Audio = Object.create(null) as Audio;
     audioCommon.src = 'http://localhost:8081/song/001.mp3';
+    // audioCommon.src =
+    //   'https://r6---sn-3qqp-ioqlr.googlevideo.com/videoplayback?expire=1635583174&ei=ZrB8Ydu5JarXs8IP24KX6As&ip=113.154.12.148&id=o-ABzauxyTnqWQvDXPL6rwCVc3Kr8_ayq5XFGFyWIeajsZ&itag=251&source=youtube&requiressl=yes&mh=OF&mm=31%2C29&mn=sn-3qqp-ioqlr%2Csn-oguelnsz&ms=au%2Crdu&mv=m&mvi=6&pcm2cms=yes&pl=19&initcwndbps=1293750&vprv=1&mime=audio%2Fwebm&ns=7UGGnKoG6ZiqSxDS9UagGQYG&gir=yes&clen=4133796&dur=233.921&lmt=1574712466405367&mt=1635561168&fvip=2&keepalive=yes&fexp=24001373%2C24007246&c=WEB&txp=5531432&n=YV5SGQGhA3eAP928&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgBGXuEM4BD5xtFK-ODdTac3h6R1nr_Gv4lYCDWQdnFIICIQDQxmt04zwpkjv5i4Ad0x9YAOycgX0l4yrDFGF4ZXMeLQ%3D%3D&sig=AOq0QJ8wRAIgN0oG3UTLzW279NyA_A4QcZswTPZCbmAbuZS3_0qJVqsCIDjNNEZ_j-K3jO3guwNNLjonjsneaBJlibgJnLuns9f1';
     // let songStoreVo: SongStoreVo = {
     //   name: '夜曲',
     //   msrc: '6Q0Pd53mojY',

@@ -39,7 +39,7 @@
           </div>
         </div>
         <!-- @touchmove="$store.commit('showMiniMusic', false)" -->
-        <div v-else class="search-list">
+        <div v-else class="search-list d-flex">
           <div
             v-for="(item, index) of songStoreVos"
             :key="index"
@@ -50,6 +50,24 @@
               <span class="music-name">{{
                 index + 1 + '.&nbsp; ' + item.name
               }}</span>
+            </div>
+            <div v-if="existsMysongs(index)">
+              <button
+                @click="deal2MyCollection(index, 'add')"
+                class="download2"
+              >
+                加入收藏
+              </button>
+              <!-- <b-button
+                class="download2"
+                @click="deal2MyCollection(index, 'add')"
+                >加入收藏</b-button
+              > -->
+            </div>
+            <div v-else>
+              <button @click="deal2MyCollection(index, 'del')" class="download">
+                取消收藏
+              </button>
             </div>
           </div>
 
@@ -78,6 +96,7 @@ import { SongStoreVo, SongRequestVo } from '@/store/vo/music-song-vo';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon, Audio } from '@/store/vo/app-common';
 import { songDetailStoreModule } from '@/store/modules/song-detail-store';
+import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
 import {
   SongDetailStoreVo,
   SongDetailRequestVo,
@@ -90,6 +109,8 @@ const baseUrl = process.env.VUE_APP_BASE_API;
 export default class Find extends Vue {
   private baseUrl: string = baseUrl;
   private songStoreVos: SongStoreVo[] = songStoreModule.getSongs;
+  private myCollectionSongs: SongStoreVo[] =
+    myClollectSongStoreModule.getMyCollectSongs;
   private beforeCreate() {
     // this.$store.commit('showMiniMusic', true);
   }
@@ -217,7 +238,7 @@ export default class Find extends Vue {
     let songDetailStoreVo: SongDetailStoreVo[] =
       songDetailStoreModule.getSongsDetail;
     if (songDetailStoreVo && songDetailStoreVo.length > 0) {
-      return songDetailStoreVo[0].msrc;
+      return songDetailStoreVo[0].tmpsrc;
     } else {
       return '';
     }
@@ -230,6 +251,50 @@ export default class Find extends Vue {
       this.isShowHot = false;
       this.isShowHistory = true;
       this.musicList = [];
+    }
+  }
+
+  private deal2MyCollection(index: number, deal: string): void {
+    if (this.songStoreVos[index]) {
+      let songStoreVo: SongStoreVo = this.songStoreVos[index];
+      if (deal === 'add') {
+        let allcollections: SongStoreVo[] =
+          myClollectSongStoreModule.getMyCollectSongs;
+        let exists: SongStoreVo[] = allcollections.filter(
+          (x) => x.msrc === songStoreVo.msrc
+        );
+        if (exists.length > 0) {
+          console.log('该歌曲已经添加');
+        } else {
+          myClollectSongStoreModule.exeAddSong2MyCollectApi(songStoreVo);
+        }
+      }
+      if (deal === 'del') {
+        let allcollections: SongStoreVo[] =
+          myClollectSongStoreModule.getMyCollectSongs;
+        let exists: SongStoreVo[] = allcollections.filter(
+          (x) => x.msrc === songStoreVo.msrc
+        );
+        if (exists.length > 0) {
+          myClollectSongStoreModule.exeDelSongfromMyCollectApi(songStoreVo);
+        } else {
+          console.log('该歌曲已经被取消收藏');
+        }
+      }
+    }
+  }
+
+  private existsMysongs(index: number): boolean {
+    if (this.songStoreVos[index]) {
+      let songStoreVo: SongStoreVo = this.songStoreVos[index];
+      let allcollections: SongStoreVo[] =
+        myClollectSongStoreModule.getMyCollectSongs;
+      let exists: SongStoreVo[] = allcollections.filter(
+        (x) => x.msrc === songStoreVo.msrc
+      );
+      return exists.length <= 0;
+    } else {
+      return true;
     }
   }
 
@@ -526,5 +591,45 @@ export default class Find extends Vue {
 //   to {
 //     transform: rotate(360deg);
 //   }
+// }
+.download2 {
+  display: inline-block;
+  margin-right: 5px;
+  background: #339dff;
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 20px;
+  border-radius: 20px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  width: 70px;
+  text-align: center;
+}
+
+// .download2:hover {
+//   background: #fff;
+//   color: #339dff;
+//   box-shadow: 0 4px 4px rgba(83, 100, 255, 0.32);
+// }
+.download {
+  display: inline-block;
+  text-decoration: none;
+  border: 2px solid #d9edff;
+  color: #339dff;
+  font-size: 13px;
+  text-align: center;
+  line-height: 20px;
+  border-radius: 30px;
+  padding: 0 0px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  background: #fff;
+  width: 70px;
+  margin-right: 40px;
+}
+
+// .download:hover {
+//   box-shadow: 0 2px 4px rgba(83, 100, 255, 0.45);
 // }
 </style>

@@ -38,6 +38,35 @@ class myClollectSongStore extends VuexModule {
 
   /**
    *
+   * @param
+   */
+  @Action({ rawError: true })
+  public async exeAddSong2MyCollectApi(
+    songStoreVo: SongStoreVo
+  ): Promise<void> {
+    this.songStoreVos.push(songStoreVo);
+    // const response = await ApiService.Post('/addSong2Mycollection', songStoreVos);
+    //this.setMySongsStore(response.data);
+  }
+
+  /**
+   *
+   * @param
+   */
+  @Action({ rawError: true })
+  public async exeDelSongfromMyCollectApi(
+    songStoreVo: SongStoreVo
+  ): Promise<void> {
+    const songStoreVoTmp: SongStoreVo[] = this.songStoreVos.filter(
+      (x) => x.msrc !== songStoreVo.msrc
+    );
+    this.setMySongsStore(songStoreVoTmp);
+    // const response = await ApiService.Post('/addSong2Mycollection', songStoreVos);
+    //this.setMySongsStore(response.data);
+  }
+
+  /**
+   *
    * @param publickey
    */
   @Mutation
