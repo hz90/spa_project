@@ -48,6 +48,7 @@ export default class Hooks {
             name: '夜曲',
             msrc: '6Q0Pd53mojY',
             psrc: 'https://i.ytimg.com/vi/6Q0Pd53mojY/hqdefault.jpg',
+            tmpsrc: "",
         };
         audioCommon.name = songStoreVo.name;
         audioCommon.musicImgSrc = songStoreVo.psrc;

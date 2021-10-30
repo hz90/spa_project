@@ -140,8 +140,7 @@ export default class Find extends Vue {
       //点击相同的音乐直接返回
       let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
       if (
-        !songStoreVo.msrc ||
-        appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.msrc
+        appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.tmpsrc
       ) {
         console.log(
           '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
@@ -157,15 +156,15 @@ export default class Find extends Vue {
       let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
 
       //获取音乐详细信息
-      this.songStoreVos[index].msrc = await this.getMusicDetail(
+      this.songStoreVos[index].tmpsrc = await this.getMusicDetail(
         this.songStoreVos[index]
       );
 
-      if (songStoreVo.msrc.indexOf('https') > -1) {
+      if (songStoreVo.tmpsrc.indexOf('https') > -1) {
         console.log('cloud music');
-        audioCommon.src = songStoreVo.msrc;
+        audioCommon.src = songStoreVo.tmpsrc;
       } else {
-        audioCommon.src = 'http://localhost:8081' + songStoreVo.msrc;
+        audioCommon.src = 'http://localhost:8081' + songStoreVo.tmpsrc;
       }
       audioCommon.name = songStoreVo.name;
       if (songStoreVo.psrc.indexOf('https') > -1) {

@@ -156,7 +156,7 @@ import { Component, Vue } from 'vue-property-decorator';
 })
 /* eslint-disable */
 export default class Play extends Vue {
-   private nativeAudio: any = Object.create(null) as any;
+  private nativeAudio: any = Object.create(null) as any;
   private mounted() {
     this.nativeAudio = document.querySelector('audio');
     this.nativeAudio.addEventListener('play', () => {
@@ -185,7 +185,7 @@ export default class Play extends Vue {
     return this.$store.state.skinColor;
   }
 
-  private defaultImg: any = '/assets/images/default.png';
+  private defaultImg: any = '/default.png';
   private playIcons: any = ['url("./play.svg")', 'url("./pause.svg")'];
   private now: any = 0;
   private totalTime: any = '0:00';
@@ -202,7 +202,7 @@ export default class Play extends Vue {
     this.isShowSkinColors = false;
     this.isShowMusicList = false;
   }
-  private toggleMusic(index:any): void {
+  private toggleMusic(index: any): void {
     this.$store.commit('toggleMusic', index);
     this.$store.commit('play', true);
     setTimeout(() => {

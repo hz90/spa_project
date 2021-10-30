@@ -38,12 +38,13 @@ const instance = axios.create(axiosConfig);
  * 携带当前页面路由，以期在登录页面完成登录后返回当前页面
  */
 const toLogin = () => {
-  router.replace({
-    path: '/social',
-    query: {
-      redirect: router.currentRoute.fullPath,
-    },
-  });
+  router.push("/login");
+  // router.replace({
+  //   path: '/login',
+  //   // query: {
+  //   //   redirect: router.currentRoute.fullPath,
+  //   // },
+  // });
 };
 
 /**

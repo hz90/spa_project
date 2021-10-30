@@ -97,16 +97,15 @@ export default class App extends Vue {
     appCommon.isShowAbout = false; //显示关于界面
     appCommon.isPlaying = false; //显示bofang
     let audioCommon: Audio = Object.create(null) as Audio;
-    //audioCommon.src = 'http://localhost:8081/song/002.mp3';
+    audioCommon.src = 'http://localhost:8081/song/001.mp3';
     // let songStoreVo: SongStoreVo = {
     //   name: '夜曲',
     //   msrc: '6Q0Pd53mojY',
     //   psrc: '',
     // };
-    //let musicDetail = this.getMusicDetail(songStoreVo);
+    // let musicDetail = App.getMusicDetail(songStoreVo);
 
-    audioCommon.src =
-      'https://r6---sn-3qqp-ioqlr.googlevideo.com/videoplayback?expire=1635077986&ei=Avt0YeCpBNOw2roPoqukiA4&ip=113.154.12.148&id=o-APH8L3XI0r6JrUcX2jtwbQSlLBB0VUZuRHVUw8Jb0yDH&itag=140&source=youtube&requiressl=yes&mh=OF&mm=31%2C29&mn=sn-3qqp-ioqlr%2Csn-ogul7n7z&ms=au%2Crdu&mv=m&mvi=6&pl=19&initcwndbps=783750&vprv=1&mime=audio%2Fmp4&ns=cRiZLLgkuU9-xnMh94En0EwG&gir=yes&clen=3787154&dur=233.941&lmt=1574712465183568&mt=1635055959&fvip=2&keepalive=yes&fexp=24001373%2C24007246&c=WEB&txp=5531432&n=cZ5NUhfjoDyQV5k_zwx&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRAIgdAFmxbNICvj9KCnKhCoVCwKk7uhjNP6REThwbNjc5FQCIFxFQG8nRMtqpmBtXGz9ox1NNshS30bK2WGUaBC8BPis&sig=AOq0QJ8wRQIgJ4hke4uiAcbhb67r8F5Dp6JmfSTvllR8meovh9AnxNUCIQD7fRGrBIv8YfHvxw0PVx513YES7kghfPv4WmELUveRHg==';
+    // audioCommon.src = musicDetail;
 
     audioCommon.name = 'test';
     audioCommon.musicImgSrc =
@@ -134,6 +133,13 @@ export default class App extends Vue {
     return appCommonStoreModule.getAppCommon.isPlaying;
   }
 
+  private get getAudioready(): boolean {
+    if (this.msrc) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   private mounted() {
     console.log('mounted this.audioRef=' + this.audioRef);
     this.audioRef.src = appCommonStoreModule.getAppCommon.audioCommon.src;
@@ -236,7 +242,7 @@ export default class App extends Vue {
     let s1 = s.toString().length == 1 ? '0' + s : s;
     return m + ':' + s1;
   }
-  private getMusicDetail(songStoreVos: SongStoreVo): string {
+  private static getMusicDetail(songStoreVos: SongStoreVo): string {
     let songDetailRequestVo: SongDetailRequestVo = Object.create(
       null
     ) as SongDetailRequestVo;
