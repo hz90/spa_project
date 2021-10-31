@@ -40,6 +40,7 @@ class loginStore extends VuexModule {
       console.log(response);
     } else {
       this.setTokenToStore(response.data.data);
+      //this.name = loginStoreVo.username;
     }
   }
 
@@ -52,6 +53,14 @@ class loginStore extends VuexModule {
     auth.setToken(token);
   }
 
+  @Action({ rawError: true })
+  public async setLoginUsername(username: string): Promise<void> {
+    await this.setLoginUsernameToStore(username);
+  }
+  @Mutation
+  private setLoginUsernameToStore(username: string) {
+    this.name = username;
+  }
   public get getName(): string {
     return this.name;
   }

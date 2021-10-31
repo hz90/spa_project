@@ -58,11 +58,6 @@
               >
                 加入收藏
               </button>
-              <!-- <b-button
-                class="download2"
-                @click="deal2MyCollection(index, 'add')"
-                >加入收藏</b-button
-              > -->
             </div>
             <div v-else>
               <button @click="deal2MyCollection(index, 'del')" class="download">

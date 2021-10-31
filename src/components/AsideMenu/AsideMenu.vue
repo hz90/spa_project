@@ -8,7 +8,9 @@
           <img src="@/assets/images/default.png" alt="zhz.com" />
           <!-- </a> -->
           <div class="about">
-            <span class="name"><a href="#">zhz</a></span>
+            <span class="name"
+              ><a href="#">{{ loginUsername }}</a></span
+            >
             <!-- <span class="level">Lv100</span>
             <span @click="isSignIn = true" class="sign">
               <i></i>
@@ -48,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon } from '@/store/vo/app-common';
 @Component({
@@ -59,7 +61,8 @@ export default class AsideMenu extends Vue {
   //
   private linkBorderIndex = 1;
   private skinColor = '#B72712';
-
+  @Prop({ default: '未登录' })
+  private loginUsername!: string;
   /**
    * 是否显示侧显示栏
    */

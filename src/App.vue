@@ -4,7 +4,10 @@
     <transition name="show">
       <div v-show="isShowIndex()" class="index">
         <!-- 侧边栏 -->
-        <AsideMenu v-show="isShowAsideMenu()"></AsideMenu>
+        <AsideMenu
+          :login-username="loginUsername"
+          v-show="isShowAsideMenu()"
+        ></AsideMenu>
 
         <!-- 头部 -->
         <MusicHeader></MusicHeader>
@@ -65,6 +68,7 @@ import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon, Audio } from '@/store/vo/app-common';
 // import { AppCommon } from '@/store/vo/app-common';
 import { songDetailStoreModule } from '@/store/modules/song-detail-store';
+import { loginModule } from '@/store/modules/login-store';
 import {
   SongDetailStoreVo,
   SongDetailRequestVo,
@@ -82,6 +86,7 @@ export default class App extends Vue {
   private totalTime = '0.00';
   private audioDuration = 0;
   private showAsideMenu = appCommonStoreModule.getAppCommon.isShowAsideMenu;
+  private loginUsername = '';
 
   @Ref('audio')
   private readonly audioRef!: HTMLAudioElement;
@@ -172,6 +177,7 @@ export default class App extends Vue {
 
   private isShowAsideMenu(): boolean {
     if (appCommonStoreModule.getAppCommon.isShowAsideMenu) {
+      this.loginUsername = loginModule.getName;
       return appCommonStoreModule.getAppCommon.isShowAsideMenu;
     } else {
       return false;

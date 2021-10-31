@@ -152,6 +152,7 @@ export default class Login extends Vue {
       .then(() => {
         this.isLoading = false;
         this.success = true;
+        loginModule.setLoginUsername(this.username);
       })
       // eslint-disable-next-line
       .catch((error: any) => {
