@@ -119,6 +119,7 @@ import { loginModule } from '@/store/modules/login-store';
 import { publicKeyStoreModule } from '@/store/modules/publickey-store';
 import { loginStoreVo } from '@/store/vo/login-store-vo';
 import auth from '@/config/auth';
+import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
 @Component({
   name: 'Login',
   components: {},
@@ -153,6 +154,7 @@ export default class Login extends Vue {
         this.isLoading = false;
         this.success = true;
         loginModule.setLoginUsername(this.username);
+        myClollectSongStoreModule.exeGetMySongsApi();
       })
       // eslint-disable-next-line
       .catch((error: any) => {

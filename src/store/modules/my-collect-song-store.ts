@@ -45,8 +45,11 @@ class myClollectSongStore extends VuexModule {
     songStoreVo: SongStoreVo
   ): Promise<void> {
     this.songStoreVos.push(songStoreVo);
-    // const response = await ApiService.Post('/addSong2Mycollection', songStoreVos);
-    //this.setMySongsStore(response.data);
+    const response = await ApiService.Post(
+      '/addSong2Mycollection',
+      songStoreVo
+    );
+    // this.setMySongsStore(response.data);
   }
 
   /**
@@ -61,8 +64,11 @@ class myClollectSongStore extends VuexModule {
       (x) => x.msrc !== songStoreVo.msrc
     );
     this.setMySongsStore(songStoreVoTmp);
-    // const response = await ApiService.Post('/addSong2Mycollection', songStoreVos);
-    //this.setMySongsStore(response.data);
+    const response = await ApiService.Post(
+      '/delSongFromMycollect',
+      songStoreVo
+    );
+    // this.setMySongsStore(response.data);
   }
 
   /**
