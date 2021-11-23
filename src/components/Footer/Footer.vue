@@ -7,12 +7,22 @@
     >
       <div class="mini-music">
         <div class="music-img">
-          <img
+          <!-- <img
             @click="showPlay"
             ref="img"
             v-bind:src="audioCommon.musicImgSrc"
             alt="zhz.com"
-          />
+          /> -->
+          <span>
+            <button id="prevmusic" @touchstart="toggleMusic(1)">
+              上一首
+            </button></span
+          >
+          <span>
+            <button id="nextmusic" @touchstart="toggleMusic(2)">
+              下一首
+            </button></span
+          >
         </div>
         <div class="music-name">
           <p @click="showPlay">
@@ -51,9 +61,16 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { appCommonStoreModule } from '@/store/modules/app-common-store';
 // import { AppCommon, Audio } from '@/store/vo/app-common';
-import { Audio } from '@/store/vo/app-common';
+import { SongStoreVo } from '@/store/vo/music-song-vo';
+import { appCommonStoreModule } from '@/store/modules/app-common-store';
+import { AppCommon, Audio } from '@/store/vo/app-common';
+import { songDetailStoreModule } from '@/store/modules/song-detail-store';
+import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
+import {
+  SongDetailStoreVo,
+  SongDetailRequestVo,
+} from '@/store/vo/music-song-detail-vo';
 @Component({
   name: 'Footer',
   components: {},
@@ -135,7 +152,7 @@ export default class Footer extends Vue {
   private skinColor(): string {
     return this.$store.state.skinColor;
   }
-  private defaultImg = '/assests/images/default.png';
+  // private defaultImg = '/assests/images/default.png';
 
   // private autoChangeMusic() {
   //   console.log('点击音乐发生变更');
@@ -245,6 +262,117 @@ export default class Footer extends Vue {
     let s = Math.floor(seconds - 60 * Number(m1));
     let s1 = s.toString().length == 1 ? '0' + s : s;
     return m + ':' + s1;
+  }
+  // 点击切换音乐
+  private async toggleMusic(indexInputType: number): Promise<void> {
+    let songDetailStoreVo: SongDetailStoreVo[] =
+      songDetailStoreModule.getSongsDetail;
+    let songStoreVos: SongStoreVo[] =
+      myClollectSongStoreModule.getMyCollectSongs;
+    let index = 0;
+    if (songDetailStoreVo && songDetailStoreVo.length > 0) {
+      let musicSrc = songDetailStoreVo[0].msrc;
+      let findindex = songStoreVos.findIndex((x) => x.msrc === musicSrc);
+
+      if (findindex > -1) {
+        if (indexInputType === 1) {
+          index = findindex - 1;
+        } else {
+          index = findindex + 1;
+        }
+      }
+    }
+    if (index < 0) {
+      index = songStoreVos.length - 1;
+    }
+    if (index > songStoreVos.length - 1) {
+      index = 0;
+    }
+    if (songStoreVos[index]) {
+      let songStoreVo: SongStoreVo = songStoreVos[index];
+      //点击相同的音乐直接返回
+      let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+      // if (
+      //   appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.tmpsrc
+      // ) {
+      //   console.log(
+      //     '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
+      //   );
+      //   this.isLoading = false;
+      //   // if (!appCommon.isPlaying) {
+      //   //   appCommon.isPlaying = true;
+      //   //   appCommonStoreModule.setAppCommon(appCommon);
+      //   // }
+      //   return;
+      // }
+      // console.log('点击切换音乐' + JSON.stringify(songStoreVos[index]));
+      let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
+
+      //获取音乐详细信息
+      songStoreVos[index].tmpsrc = await this.getMusicDetail(
+        songStoreVos[index]
+      );
+
+      if (songStoreVo.tmpsrc.indexOf('https') > -1) {
+        console.log('cloud music');
+        audioCommon.src = songStoreVo.tmpsrc;
+      } else {
+        audioCommon.src = 'http://localhost:8081' + songStoreVo.tmpsrc;
+      }
+      audioCommon.name = songStoreVo.name;
+      if (songStoreVo.psrc.indexOf('https') > -1) {
+        console.log('cloud music');
+        audioCommon.musicImgSrc = songStoreVo.psrc;
+      } else {
+        audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      }
+      audioCommon.index = 0;
+      appCommon.audioCommon = audioCommon;
+      appCommon.isPlaying = true;
+      appCommonStoreModule.setAppCommon(appCommon);
+      this.playVideo(appCommon);
+    }
+  }
+  private playVideo(appCommon: AppCommon): void {
+    // console.log('appCommon.localAudio' + appCommon.localAudio);
+    appCommon.localAudio.src =
+      appCommonStoreModule.getAppCommon.audioCommon.src;
+    appCommon.localAudio.load();
+    // this.nativeAudio.canplay=true;
+    //this.totalTime = this.transformTime(this.nativeAudio.duration);
+    let promise = appCommon.localAudio.play();
+    //解决Uncaught (in promise) DOMException: play() failed because the user didn't interact with the document first.
+    if (promise !== undefined) {
+      promise
+        .then(() => {
+          // Autoplay started
+          console.log('Autoplay started music find');
+        })
+        // eslint-disable-next-line
+        .catch((error: any) => {
+          // console.log(error);
+          // Autoplay was prevented.
+          //this.nativeAudio.muted = true;
+          // this.nativeAudio.play();
+        });
+    }
+  }
+
+  private async getMusicDetail(songStoreVos: SongStoreVo): Promise<string> {
+    let songDetailRequestVo: SongDetailRequestVo = Object.create(
+      null
+    ) as SongDetailRequestVo;
+    songDetailRequestVo = Object.assign(songDetailRequestVo, songStoreVos);
+    let songDetailRequestVos: SongDetailRequestVo[] = [];
+    songDetailRequestVos.push(songDetailRequestVo);
+    await songDetailStoreModule.exeGetSongsDetailApi(songDetailRequestVos);
+    let songDetailStoreVo: SongDetailStoreVo[] =
+      songDetailStoreModule.getSongsDetail;
+    if (songDetailStoreVo && songDetailStoreVo.length > 0) {
+      return songDetailStoreVo[0].tmpsrc;
+    } else {
+      return '';
+    }
   }
 }
 </script>

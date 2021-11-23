@@ -9,11 +9,27 @@
         :key="index"
         class="music-item"
       >
-        <div @click="toggleMusic(index)">
+        <div v-if="isMobile">
           <img v-bind:src="item.psrc" class="music-img" />
           <span class="music-name">{{
             index + 1 + '.&nbsp; ' + item.name
           }}</span>
+          <span>
+            <button @touchstart="toggleMusic(index)" class="download2">
+              点击播放
+            </button></span
+          >
+        </div>
+        <div v-else>
+          <img v-bind:src="item.psrc" class="music-img" />
+          <span class="music-name">{{
+            index + 1 + '.&nbsp; ' + item.name
+          }}</span>
+          <span>
+            <button @click="toggleMusic(index)" class="download2">
+              点击播放
+            </button></span
+          >
         </div>
         <span v-on:click="del(index)" class="del-icon"></span>
       </div>
@@ -73,20 +89,20 @@ export default class MusicList extends Vue {
       let songStoreVo: SongStoreVo = this.songStoreVos[index];
       //点击相同的音乐直接返回
       let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
-      if (
-        appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.tmpsrc
-      ) {
-        console.log(
-          '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
-        );
-        this.isLoading = false;
-        // if (!appCommon.isPlaying) {
-        //   appCommon.isPlaying = true;
-        //   appCommonStoreModule.setAppCommon(appCommon);
-        // }
-        return;
-      }
-      console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
+      // if (
+      //   appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.tmpsrc
+      // ) {
+      //   console.log(
+      //     '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
+      //   );
+      //   this.isLoading = false;
+      //   // if (!appCommon.isPlaying) {
+      //   //   appCommon.isPlaying = true;
+      //   //   appCommonStoreModule.setAppCommon(appCommon);
+      //   // }
+      //   return;
+      // }
+      // console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
       let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
 
       //获取音乐详细信息
@@ -123,6 +139,7 @@ export default class MusicList extends Vue {
     //this.totalTime = this.transformTime(this.nativeAudio.duration);
     let promise = appCommon.localAudio.play();
     //解决Uncaught (in promise) DOMException: play() failed because the user didn't interact with the document first.
+    //Auto play music effect, solve the problem of browser or app auto play
     if (promise !== undefined) {
       promise
         .then(() => {
@@ -163,6 +180,12 @@ export default class MusicList extends Vue {
       myClollectSongStoreModule.exeDelSongfromMyCollectApi(songStoreVo);
       this.songStoreVos = myClollectSongStoreModule.getMyCollectSongs;
     }
+  }
+
+  private isMobile(): boolean {
+    const u = navigator.userAgent;
+    const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+    return isiOS;
   }
 }
 </script>
@@ -235,6 +258,20 @@ export default class MusicList extends Vue {
     width: 200px;
     font-size: 80%;
     color: gray;
+  }
+  .download2 {
+    display: inline-block;
+    margin-right: 5px;
+    background: #339dff;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 20px;
+    border-radius: 20px;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 70px;
+    text-align: center;
   }
 }
 .loading {

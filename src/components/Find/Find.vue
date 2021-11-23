@@ -45,12 +45,39 @@
             :key="index"
             class="music-item"
           >
-            <div @click="toggleMusic(index)">
+            <div v-if="isMobile">
               <img v-bind:src="item.psrc" class="music-img" />
               <span class="music-name">{{
                 index + 1 + '.&nbsp; ' + item.name
               }}</span>
+              <span style="float: right; padding-right: 2px">
+                <button @touchstart="toggleMusic(index)" class="download2">
+                  点击播放
+                </button></span
+              >
             </div>
+            <div v-else>
+              <img v-bind:src="item.psrc" class="music-img" />
+              <span class="music-name">{{
+                index + 1 + '.&nbsp; ' + item.name
+              }}</span>
+              <span style="float: right; padding-right: 2px">
+                <button @click="toggleMusic(index)" class="download2">
+                  点击播放
+                </button></span
+              >
+            </div>
+            <!-- <div @click="toggleMusic(index)">
+              <img v-bind:src="item.psrc" class="music-img" />
+              <span class="music-name">{{
+                index + 1 + '.&nbsp; ' + item.name
+              }}</span>
+              <span>
+                <button @touchstart="toggleMusic(index)" class="download2">
+                  加入收藏
+                </button></span
+              >
+            </div> -->
             <div v-if="existsMysongs(index)">
               <button
                 @click="deal2MyCollection(index, 'add')"
@@ -155,20 +182,20 @@ export default class Find extends Vue {
       let songStoreVo: SongStoreVo = this.songStoreVos[index];
       //点击相同的音乐直接返回
       let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
-      if (
-        appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.tmpsrc
-      ) {
-        console.log(
-          '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
-        );
-        this.isLoading = false;
-        // if (!appCommon.isPlaying) {
-        //   appCommon.isPlaying = true;
-        //   appCommonStoreModule.setAppCommon(appCommon);
-        // }
-        return;
-      }
-      console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
+      // if (
+      //   appCommonStoreModule.getAppCommon.audioCommon.src === songStoreVo.tmpsrc
+      // ) {
+      //   console.log(
+      //     '点击相同的音乐' + JSON.stringify(this.songStoreVos[index])
+      //   );
+      //   this.isLoading = false;
+      //   // if (!appCommon.isPlaying) {
+      //   //   appCommon.isPlaying = true;
+      //   //   appCommonStoreModule.setAppCommon(appCommon);
+      //   // }
+      //   return;
+      // }
+      // console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
       let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
 
       //获取音乐详细信息
@@ -197,7 +224,7 @@ export default class Find extends Vue {
     }
   }
   private playVideo(appCommon: AppCommon): void {
-    console.log('appCommon.localAudio' + appCommon.localAudio);
+    // console.log('appCommon.localAudio' + appCommon.localAudio);
     appCommon.localAudio.src =
       appCommonStoreModule.getAppCommon.audioCommon.src;
     appCommon.localAudio.load();
@@ -213,7 +240,7 @@ export default class Find extends Vue {
         })
         // eslint-disable-next-line
         .catch((error: any) => {
-          console.log(error);
+          // console.log(error);
           // Autoplay was prevented.
           //this.nativeAudio.muted = true;
           // this.nativeAudio.play();
@@ -292,7 +319,12 @@ export default class Find extends Vue {
       return true;
     }
   }
-
+  private isMobile(): boolean {
+    const u = navigator.userAgent;
+    const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+    const isIos = !!u.match(/AppleWebKit.*Mobile.*/);
+    return isiOS || isIos;
+  }
   // 解码
   // private strDecode(str: any): any {
   //   return str.replace(

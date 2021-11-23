@@ -4,7 +4,7 @@
       <span @click="showAsideMenu()" class="func"
         ><i class="func-icon"></i
       ></span>
-      <p>○○の云音乐</p>
+      <p>云音乐</p>
       <span class="search"><i @click="toSearch" class="search-icon"></i></span>
     </div>
     <div class="tab">

@@ -14,7 +14,7 @@
               @touchstart="isHover = true"
               @touchEnd="isHover = false"
               :class="{ hover: isHover }"
-              href="https://github.com/microzz/vue-music-player"
+              href="javascript:void(0)"
               target="_blank"
               >GitHub</a
             >
@@ -24,14 +24,12 @@
               @touchstart="isHover = true"
               @touchEnd="isHover = false"
               :class="{ hover: isHover }"
-              href="https://zhz.com/"
+              href="javascript:void(0)"
               target="_blank"
               >zhaohaizhou</a
             >
           </p>
-          <p>
-            <br />&nbsp;&nbsp;&nbsp;专属圆圆，倾心之作～～如果你觉得该项目不错，还可以请我吃辣条😄↓↓↓
-          </p>
+          <p><br />&nbsp;&nbsp;&nbsp;云音乐初版</p>
           <div class="help">
             <img src="./help.png" alt="zhaohaizhou.com" />
           </div>
