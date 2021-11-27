@@ -44,13 +44,14 @@
     <!--ended：当目前的播放列表已结束时-->
     <!-- <audio v-bind:src="msrc" v-bind:autoplay="isPlaying" ref="audio"></audio> -->
 
-    <audio
+    <!-- <audio
       :src="msrc"
       v-bind:autoplay="isPlaying"
       preload="auto"
       ref="audio"
       @touchstart="play"
-    >
+    > -->
+    <audio autoplay preload="auto" ref="audio" @touchstart="play">
       <!--（1）属性：controls，preload（2）事件：canplay，timeupdate，ended（3）方法：play()，pause() -->
       <!--controls：向用户显示音频控件（播放/暂停/进度条/音量）-->
       <!--preload：属性规定是否在页面加载后载入音频-->
@@ -58,8 +59,9 @@
       <!--timeupdate：当目前的播放位置已更改时-->
       <!--ended：当目前的播放列表已结束时-->
       您的浏览器不支持音频播放
-      <!-- <source :src="msrc" type="audio/mpeg" /> -->
+      <source :src="msrc" type="audio/mpeg" />
     </audio>
+    <div>houtai bofang</div>
 
     <!-- 关于界面 -->
     <AboutVue v-if="isShowAbout()"></AboutVue>
@@ -83,6 +85,7 @@ import {
 } from '@/store/vo/music-song-detail-vo';
 import { SongStoreVo } from '@/store/vo/music-song-vo';
 import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
+import { Howl } from 'howler';
 const baseUrl = process.env.VUE_APP_BASE_API;
 function musicInBrowserHandler() {
   document.body.removeEventListener('touchstart', musicInBrowserHandler);
@@ -187,7 +190,10 @@ export default class App extends Vue {
         // console.log('this.nowMusicIsEned=' + this.nowMusicIsEned);
         let interval = setInterval(() => {
           this.now = this.audioRef.currentTime;
-          if (this.transformTimeIos(this.now) === this.totalTime) {
+          if (
+            this.transformTimeIos(this.now) === this.totalTime ||
+            this.now > this.audioRef.duration / 2
+          ) {
             // this.play();
             this.audioRef.pause();
             appCommonStoreModule.getAppCommon.isPlaying = false;
@@ -221,7 +227,10 @@ export default class App extends Vue {
         let interval = setInterval(() => {
           this.now = this.audioRef.currentTime;
 
-          if (this.transformTimeIos(this.now) === this.totalTime) {
+          if (
+            this.transformTimeIos(this.now) === this.totalTime ||
+            this.now > this.audioRef.duration / 2
+          ) {
             // this.play();
             appCommonStoreModule.getAppCommon.isPlaying = false;
             this.audioRef.pause();
@@ -356,18 +365,18 @@ export default class App extends Vue {
     let s1 = s.toString().length == 1 ? '0' + s : s;
     return m + ':' + s1;
   }
-  private getMusicDetail(songStoreVos: SongStoreVo): string {
+  private async getMusicDetail(songStoreVos: SongStoreVo): Promise<string> {
     let songDetailRequestVo: SongDetailRequestVo = Object.create(
       null
     ) as SongDetailRequestVo;
     songDetailRequestVo = Object.assign(songDetailRequestVo, songStoreVos);
     let songDetailRequestVos: SongDetailRequestVo[] = [];
     songDetailRequestVos.push(songDetailRequestVo);
-    songDetailStoreModule.exeGetSongsDetailApi(songDetailRequestVos);
+    await songDetailStoreModule.exeGetSongsDetailApi(songDetailRequestVos);
     let songDetailStoreVo: SongDetailStoreVo[] =
       songDetailStoreModule.getSongsDetail;
     if (songDetailStoreVo && songDetailStoreVo.length > 0) {
-      return songDetailStoreVo[0].msrc;
+      return songDetailStoreVo[0].tmpsrc;
     } else {
       return '';
     }
@@ -413,7 +422,7 @@ export default class App extends Vue {
     }
   }
   @Watch('nowMusicIsEned')
-  private async autoPlayNext() {
+  private autoPlayNext() {
     console.log('自动监视是否播放完');
     if (this.nowMusicIsEned) {
       let i = 0;
@@ -424,17 +433,47 @@ export default class App extends Vue {
       }
       // this.nowMusicIsEned = false;
       console.log('自动监视是否播放完 next');
-      let toggleMusic = this.toggleMusic(2).then(() => {
-        //this.createTouchstartEventAndDispatch(this.audioRef);
-      });
-      setTimeout(function async() {
-        toggleMusic;
-      }, 1500);
-      // appCommonStoreModule.getAppCommon.isPlaying = true;
-      // this.audioRef.pause();
-      this.nowMusicIsEned = false;
+      if (this.isMobile()) {
+        this.nowMusicIsEned = false;
+        console.log('自动监视是否播放完 next');
+        console.log(
+          'appCommonStoreModule.getAppCommon.audioCommon.src=' +
+            appCommonStoreModule.getAppCommon.audioCommon.src
+        );
+        let musicUrl = '';
+        this.getPlayMusicUrl(2).then((val) => {
+          musicUrl = val;
+          console.log('asynchronous logging has val:', val);
+          const sound = new Howl({
+            src: [musicUrl],
+            html5: true,
+          });
+          console.log('sound howl bofang ');
+          sound.play();
+        });
+      } else {
+        //iphone
+        let toggleMusic = this.toggleMusic(2).then(() => {
+          //this.createTouchstartEventAndDispatch(this.audioRef);
+        });
+        console.log(
+          'appCommonStoreModule.getAppCommon.audioCommon.src=' +
+            appCommonStoreModule.getAppCommon.audioCommon.src
+        );
+        setTimeout(function async() {
+          toggleMusic;
+        }, 1500);
+
+        // appCommonStoreModule.getAppCommon.isPlaying = true;
+        //this.audioRef.pause();
+        this.nowMusicIsEned = false;
+        this.createTouchstartEventAndDispatch(this.audioRef);
+      }
     }
-    this.createTouchstartEventAndDispatch(this.audioRef);
+  }
+
+  private stepFunction() {
+    window.requestAnimationFrame(this.stepFunction.bind(this));
   }
   private createTouchstartEventAndDispatch(el: any) {
     console.log('crate touch is run');
@@ -485,6 +524,39 @@ export default class App extends Vue {
     }
   }
   // 点击切换音乐
+  private async getPlayMusicUrl(indexInputType: number): Promise<string> {
+    let musicUrl = '';
+    let songDetailStoreVo: SongDetailStoreVo[] =
+      songDetailStoreModule.getSongsDetail;
+    let songStoreVos: SongStoreVo[] =
+      myClollectSongStoreModule.getMyCollectSongs;
+    let index = 0;
+    if (songDetailStoreVo && songDetailStoreVo.length > 0) {
+      let musicSrc = songDetailStoreVo[0].msrc;
+      let findindex = songStoreVos.findIndex((x) => x.msrc === musicSrc);
+
+      if (findindex > -1) {
+        if (indexInputType === 1) {
+          index = findindex - 1;
+        } else {
+          index = findindex + 1;
+        }
+      }
+    }
+    if (index < 0) {
+      index = songStoreVos.length - 1;
+    }
+    if (index > songStoreVos.length - 1) {
+      index = 0;
+    }
+    if (songStoreVos[index]) {
+      //获取音乐详细信息
+      musicUrl = await this.getMusicDetail(songStoreVos[index]);
+      console.log(musicUrl);
+    }
+    return musicUrl;
+  }
+  // 点击切换音乐
   private async toggleMusic(indexInputType: number): Promise<void> {
     let songDetailStoreVo: SongDetailStoreVo[] =
       songDetailStoreModule.getSongsDetail;
@@ -530,9 +602,9 @@ export default class App extends Vue {
       let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
 
       //获取音乐详细信息
-      songStoreVos[index].tmpsrc = await this.getMusicDetail(
-        songStoreVos[index]
-      );
+      await this.getMusicDetail(songStoreVos[index]).then((val) => {
+        songStoreVos[index].tmpsrc = val;
+      });
 
       if (songStoreVo.tmpsrc.indexOf('https') > -1) {
         console.log('cloud music');
