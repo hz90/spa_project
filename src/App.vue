@@ -18,11 +18,9 @@
         <!-- 尾部mini播放器 -->
         <Footer
           :is-playing="isPlayingCommon"
-          :total-time="getTotalTime"
-          :now.sync="now"
           :audio-common="audioCommon"
-          :audio-duration="audioDuration"
-          @fatherMethod="play()"
+          :audio-duration="audioDuration()"
+          :now.sync="now"
           @fatherMethodChangeTime="changeTime"
           @fatherMethodTouchMove="touchMove"
           @fatherMethodTouchEnd="touchEnd"
@@ -61,7 +59,7 @@
       您的浏览器不支持音频播放
       <source :src="msrc" type="audio/mpeg" />
     </audio>
-    <div>houtai bofang</div>
+    <!-- <div>houtai bofang</div> -->
 
     <!-- 关于界面 -->
     <AboutVue v-if="isShowAbout()"></AboutVue>
@@ -97,14 +95,14 @@ function musicInBrowserHandler() {
 })
 export default class App extends Vue {
   // private isPlayingCommonAutoPlay = appCommonStoreModule.getAppCommon.isPlaying;
-  private now = 0;
+
   private msrc = appCommonStoreModule.getAppCommon.audioCommon.src;
   private audioCommon = appCommonStoreModule.getAppCommon.audioCommon;
   private totalTime = '0.00';
-  private audioDuration = 0;
   private showAsideMenu = appCommonStoreModule.getAppCommon.isShowAsideMenu;
   private loginUsername = '';
   private isInit = 0;
+  private now = 0;
   private nowMusicIsEned = false;
   private nameSiteMapping = new Map();
   @Ref('audio')
@@ -121,8 +119,9 @@ export default class App extends Vue {
     appCommon.isShowAbout = false; //显示关于界面
     appCommon.isPlaying = false; //显示bofang
     let audioCommon: Audio = Object.create(null) as Audio;
+    //api host
     audioCommon.src = 'http://localhost:8081/song/001.mp3';
-    audioCommon.src = 'http://52.140.206.46/song/001.mp3';
+    audioCommon.src = 'http://13.78.95.79/song/001.mp3';
     // audioCommon.src = baseUrl + '/song/001.mp3';
     // audioCommon.src =
     //   'https://r6---sn-3qqp-ioqlr.googlevideo.com/videoplayback?expire=1635583174&ei=ZrB8Ydu5JarXs8IP24KX6As&ip=113.154.12.148&id=o-ABzauxyTnqWQvDXPL6rwCVc3Kr8_ayq5XFGFyWIeajsZ&itag=251&source=youtube&requiressl=yes&mh=OF&mm=31%2C29&mn=sn-3qqp-ioqlr%2Csn-oguelnsz&ms=au%2Crdu&mv=m&mvi=6&pcm2cms=yes&pl=19&initcwndbps=1293750&vprv=1&mime=audio%2Fwebm&ns=7UGGnKoG6ZiqSxDS9UagGQYG&gir=yes&clen=4133796&dur=233.921&lmt=1574712466405367&mt=1635561168&fvip=2&keepalive=yes&fexp=24001373%2C24007246&c=WEB&txp=5531432&n=YV5SGQGhA3eAP928&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cvprv%2Cmime%2Cns%2Cgir%2Cclen%2Cdur%2Clmt&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRQIgBGXuEM4BD5xtFK-ODdTac3h6R1nr_Gv4lYCDWQdnFIICIQDQxmt04zwpkjv5i4Ad0x9YAOycgX0l4yrDFGF4ZXMeLQ%3D%3D&sig=AOq0QJ8wRAIgN0oG3UTLzW279NyA_A4QcZswTPZCbmAbuZS3_0qJVqsCIDjNNEZ_j-K3jO3guwNNLjonjsneaBJlibgJnLuns9f1';
@@ -139,18 +138,18 @@ export default class App extends Vue {
     audioCommon.musicImgSrc =
       'https://i.ytimg.com/vi/6Q0Pd53mojY/hqdefault.jpg';
     audioCommon.index = 0;
+    let sound = new Howl({
+      src: [audioCommon.src],
+      html5: true,
+      autoplay: true,
+      preload: true,
+      mute: true,
+      loop: true,
+    });
+    sound.play();
     appCommon.audioCommon = audioCommon;
-    if (appCommonStoreModule.getAppCommon.localAudio) {
-      appCommon.localAudio = appCommonStoreModule.getAppCommon.localAudio;
-    }
-    appCommonStoreModule.setAppCommon(appCommon);
+    appCommon.audioCommon.howl = sound;
 
-    // console.log('app commponent is init createAudio' + this.audioRef);
-    appCommon = appCommonStoreModule.getAppCommon;
-    appCommon.localAudio = this.audioRef;
-    if (!appCommon.localAudio) {
-      appCommon.localAudio = this.audioRef;
-    }
     appCommonStoreModule.setAppCommon(appCommon);
 
     // console.log(
@@ -161,7 +160,136 @@ export default class App extends Vue {
   private get isPlayingCommon() {
     return appCommonStoreModule.getAppCommon.isPlaying;
   }
+  private audioDuration(): number {
+    let howTotaltime = 0;
 
+    if (appCommonStoreModule.getAppCommon.audioCommon.tmpsrc) {
+      if (
+        appCommonStoreModule.getAppCommon.audioCommon.tmpsrc.indexOf('dur') >
+          -1 &&
+        appCommonStoreModule.getAppCommon.audioCommon.tmpsrc.indexOf('&lmt') >
+          -1
+      ) {
+        howTotaltime = Number(
+          appCommonStoreModule.getAppCommon.audioCommon.tmpsrc.substring(
+            appCommonStoreModule.getAppCommon.audioCommon.tmpsrc.indexOf(
+              'dur'
+            ) + 4,
+            appCommonStoreModule.getAppCommon.audioCommon.tmpsrc.indexOf('&lmt')
+          )
+        );
+      }
+    }
+    if (howTotaltime <= 0 || isNaN(howTotaltime)) {
+      howTotaltime =
+        appCommonStoreModule.getAppCommon.audioCommon.howl.duration();
+    }
+    return howTotaltime;
+  }
+
+  @Watch('now')
+  private watchNow(): void {
+    console.log(
+      'music is stop watchNow' +
+        this.transformTimeIos(this.now) +
+        '-----' +
+        this.transformTimeIos(this.audioDuration())
+    );
+    if (
+      this.transformTimeIos(this.now + 1) ===
+        this.transformTimeIos(this.audioDuration()) ||
+      this.now > this.audioDuration()
+    ) {
+      console.log('music is stop watchNow');
+      let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+      if (appCommon.audioCommon.howl) {
+        appCommon.isPlaying = !appCommon.isPlaying;
+        appCommonStoreModule.setAppCommon(appCommon);
+        appCommon.audioCommon.howl.stop();
+        // appCommon.audioCommon.howl.unload();
+        let songStoreVos: SongStoreVo[] =
+          myClollectSongStoreModule.getMyCollectSongs;
+        let findindex = -1;
+        let willPlayMusicSrc = '';
+        if (songStoreVos && songStoreVos.length > 0) {
+          //获取当前播放歌曲
+          //查看当前歌曲是否在我的收藏里
+          findindex = songStoreVos.findIndex(
+            (x) => x.msrc === appCommon.audioCommon.src
+          );
+        }
+        //在收藏里
+        if (findindex > -1) {
+          let audioCommonList: Audio[] = appCommon.audioCommonList;
+          if (!songStoreVos[findindex + 1]) {
+            findindex = 0;
+          } else {
+            findindex = findindex + 1;
+          }
+          audioCommonList.forEach((x) => {
+            if (x.src === songStoreVos[findindex].msrc) {
+              let audioCommonTmp = x;
+              appCommon.isPlaying = true;
+              appCommon.audioCommon.howl = audioCommonTmp.howl;
+              appCommon.audioCommon.name = audioCommonTmp.name;
+              appCommon.audioCommon.src = audioCommonTmp.src;
+              appCommon.audioCommon.tmpsrc = audioCommonTmp.tmpsrc;
+              appCommon.audioCommon.musicImgSrc = audioCommonTmp.musicImgSrc;
+              audioCommonTmp.howl.seek(0);
+              audioCommonTmp.howl.mute(false);
+              // audioCommonTmp.howl.play();
+              appCommonStoreModule.setAppCommon(appCommon);
+            } else {
+              // x.howl.pause();
+              x.howl.mute(true);
+            }
+          });
+          // this.getPlayMusicUrl(findindex + 1).then((val) => {
+          //   willPlayMusicSrc = val;
+          //   //  let sound= appCommon.audioCommon.howl;
+          //   let sound = new Howl({
+          //     src: [willPlayMusicSrc],
+          //     html5: true,
+          //     autoplay: true,
+          //     preload: true,
+          //     // loop: true,
+          //   });
+          //   appCommon.audioCommon.howl = sound;
+          //   appCommon.audioCommon.name = songStoreVos[findindex + 1].name;
+          //   appCommon.audioCommon.musicImgSrc =
+          //     songStoreVos[findindex + 1].psrc;
+          //   appCommon.audioCommon.src = songStoreVos[findindex + 1].tmpsrc;
+
+          //   appCommon.isPlaying = !appCommon.isPlaying;
+          //   appCommonStoreModule.setAppCommon(appCommon);
+          //   sound.load();
+          //   sound.play();
+          //   this.createTouchstartEventAndDispatch(this.audioRef);
+          // });
+        } else {
+          //不在收藏里
+          willPlayMusicSrc = appCommon.audioCommon.src;
+        }
+        // if (willPlayMusicSrc) {
+        //   // if (appCommon.audioCommon.howl) {
+        //   //   let playnewsrc: Howl = appCommon.audioCommon.howl;
+        //   //   playnewsrc.pause();
+        //   // }
+        //   let sound = new Howl({
+        //     src: [willPlayMusicSrc],
+        //     html5: true,
+        //     autoplay: true,
+        //     preload: true,
+        //     // loop: true,
+        //   });
+        //   appCommon.audioCommon.howl = sound;
+        //   appCommon.isPlaying = !appCommon.isPlaying;
+        //   appCommonStoreModule.setAppCommon(appCommon);
+        //   sound.play();
+        // }
+      }
+    }
+  }
   private get getAudioready(): boolean {
     if (this.msrc) {
       return true;
@@ -170,90 +298,88 @@ export default class App extends Vue {
     }
   }
   private mounted() {
-    // console.log('mounted this.audioRef=' + this.audioRef);
-    this.audioRef.src = appCommonStoreModule.getAppCommon.audioCommon.src;
-    //this.audioRef.load();
-    this.audioRef.addEventListener('play', () => {
-      // console.log('play Video can start, but not sure it will play through.');
-      this.totalTime = this.transformTime(this.audioRef.duration);
-      this.now = this.audioRef.currentTime;
-      setInterval(() => {
-        this.now = this.audioRef.currentTime;
-      }, 1000);
-    });
-    this.audioRef.addEventListener('canplay', (event) => {
-      // console.log(
-      //   'Video can start, but not sure it will play through.' + event
-      // );
-      this.totalTime = this.transformTime(this.audioRef.duration);
-      if (!this.nowMusicIsEned) {
-        // console.log('this.nowMusicIsEned=' + this.nowMusicIsEned);
-        let interval = setInterval(() => {
-          this.now = this.audioRef.currentTime;
-          if (
-            this.transformTimeIos(this.now) === this.totalTime ||
-            this.now > this.audioRef.duration / 2
-          ) {
-            // this.play();
-            this.audioRef.pause();
-            appCommonStoreModule.getAppCommon.isPlaying = false;
-            clearInterval(interval);
-            // this.toggleMusic(2).then(() => {
-            //   this.audioRef.play();
-            // });
-            this.nowMusicIsEned = true;
-            // return;
-          }
-        }, 1000);
-        this.nameSiteMapping.set('canplay', interval);
-      }
-      this.audioDuration = this.isMobile()
-        ? this.audioRef.duration / 2
-        : this.audioRef.duration;
-      this.localAudio = this.audioRef;
-      let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
-      appCommon.localAudio = this.audioRef;
-      // appCommon.isPlaying = false;
-      appCommonStoreModule.setAppCommon(appCommon);
-    });
-    this.audioRef.addEventListener('loadedmetadata', (event) => {
-      // console.log(
-      //   'loadedmetadata Video can start, but not sure it will play through.' +
-      //     event
-      // );
-      this.totalTime = this.transformTime(this.audioRef.duration);
-      if (!this.nowMusicIsEned) {
-        // console.log('this.nowMusicIsEned=' + this.nowMusicIsEned);
-        let interval = setInterval(() => {
-          this.now = this.audioRef.currentTime;
-
-          if (
-            this.transformTimeIos(this.now) === this.totalTime ||
-            this.now > this.audioRef.duration / 2
-          ) {
-            // this.play();
-            appCommonStoreModule.getAppCommon.isPlaying = false;
-            this.audioRef.pause();
-            clearInterval(interval);
-            this.nowMusicIsEned = true;
-            // return;
-            // this.toggleMusic(2).then(() => {
-            //   this.audioRef.play();
-            // });
-          }
-        }, 1000);
-        this.nameSiteMapping.set('loadedmetadata', interval);
-      }
-
-      this.audioDuration = this.isMobile()
-        ? this.audioRef.duration / 2
-        : this.audioRef.duration;
-      this.localAudio = this.audioRef;
-      let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
-      appCommon.localAudio = this.audioRef;
-      // appCommon.isPlaying = false;
-      appCommonStoreModule.setAppCommon(appCommon);
-    });
+    // // console.log('mounted this.audioRef=' + this.audioRef);
+    // this.audioRef.src = appCommonStoreModule.getAppCommon.audioCommon.src;
+    // //this.audioRef.load();
+    // this.audioRef.addEventListener('play', () => {
+    //   // console.log('play Video can start, but not sure it will play through.');
+    //   this.totalTime = this.transformTime(this.audioRef.duration);
+    //   this.now = this.audioRef.currentTime;
+    setInterval(() => {
+      this.now = appCommonStoreModule.getAppCommon.audioCommon.howl.seek();
+    }, 1000);
+    // });
+    // this.audioRef.addEventListener('canplay', (event) => {
+    //   // console.log(
+    //   //   'Video can start, but not sure it will play through.' + event
+    //   // );
+    //   this.totalTime = this.transformTime(this.audioRef.duration);
+    //   if (!this.nowMusicIsEned) {
+    //     // console.log('this.nowMusicIsEned=' + this.nowMusicIsEned);
+    //     let interval = setInterval(() => {
+    //       this.now = this.audioRef.currentTime;
+    //       if (
+    //         this.transformTimeIos(this.now) === this.totalTime ||
+    //         this.now > this.audioRef.duration / 2
+    //       ) {
+    //         // this.play();
+    //         this.audioRef.pause();
+    //         appCommonStoreModule.getAppCommon.isPlaying = false;
+    //         clearInterval(interval);
+    //         // this.toggleMusic(2).then(() => {
+    //         //   this.audioRef.play();
+    //         // });
+    //         this.nowMusicIsEned = true;
+    //         // return;
+    //       }
+    //     }, 1000);
+    //     this.nameSiteMapping.set('canplay', interval);
+    //   }
+    //   this.audioDuration = this.isMobile()
+    //     ? this.audioRef.duration / 2
+    //     : this.audioRef.duration;
+    //   this.localAudio = this.audioRef;
+    //   let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+    //   appCommon.localAudio = this.audioRef;
+    //   // appCommon.isPlaying = false;
+    //   appCommonStoreModule.setAppCommon(appCommon);
+    // });
+    // this.audioRef.addEventListener('loadedmetadata', (event) => {
+    //   // console.log(
+    //   //   'loadedmetadata Video can start, but not sure it will play through.' +
+    //   //     event
+    //   // );
+    //   this.totalTime = this.transformTime(this.audioRef.duration);
+    //   if (!this.nowMusicIsEned) {
+    //     // console.log('this.nowMusicIsEned=' + this.nowMusicIsEned);
+    //     let interval = setInterval(() => {
+    //       this.now = this.audioRef.currentTime;
+    //       if (
+    //         this.transformTimeIos(this.now) === this.totalTime ||
+    //         this.now > this.audioRef.duration / 2
+    //       ) {
+    //         // this.play();
+    //         appCommonStoreModule.getAppCommon.isPlaying = false;
+    //         this.audioRef.pause();
+    //         clearInterval(interval);
+    //         this.nowMusicIsEned = true;
+    //         // return;
+    //         // this.toggleMusic(2).then(() => {
+    //         //   this.audioRef.play();
+    //         // });
+    //       }
+    //     }, 1000);
+    //     this.nameSiteMapping.set('loadedmetadata', interval);
+    //   }
+    //   this.audioDuration = this.isMobile()
+    //     ? this.audioRef.duration / 2
+    //     : this.audioRef.duration;
+    //   this.localAudio = this.audioRef;
+    //   let appCommon: AppCommon = appCommonStoreModule.getAppCommon;
+    //   appCommon.localAudio = this.audioRef;
+    //   // appCommon.isPlaying = false;
+    //   appCommonStoreModule.setAppCommon(appCommon);
+    // });
     document.body.addEventListener('touchstart', musicInBrowserHandler);
   }
 
@@ -302,11 +428,13 @@ export default class App extends Vue {
     let progressBar = progressBarRef;
     let coordStart = progressBar.getBoundingClientRect().left;
     let coordEnd = event.pageX;
-    this.audioRef.currentTime =
+    let currentTime =
       ((coordEnd - coordStart) / progressBar.offsetWidth) *
-      (this.isMobile() ? this.audioRef.duration / 2 : this.audioRef.duration);
-    this.now = this.audioRef.currentTime;
-    this.audioRef.play();
+      this.audioDuration();
+    this.now = currentTime;
+    let sound = appCommonStoreModule.getAppCommon.audioCommon.howl;
+    sound.seek(this.now);
+    sound.play();
   }
   // eslint-disable-next-line
   private touchMove(event: any, progressBarRef: any, nowRef: any): void {
@@ -327,13 +455,15 @@ export default class App extends Vue {
   private touchEnd(event: any, progressBarRef: any): void {
     console.log('touchEnd');
     let nowstyle = progressBarRef;
+    let currentTime = 0;
     if (nowstyle) {
-      this.audioRef.currentTime =
-        (nowstyle.style.width.replace('%', '') / 100) *
-        (this.isMobile() ? this.audioRef.duration / 2 : this.audioRef.duration);
+      currentTime =
+        (nowstyle.style.width.replace('%', '') / 100) * this.audioDuration();
+      this.now = currentTime;
+      let sound = appCommonStoreModule.getAppCommon.audioCommon.howl;
+      sound.seek(this.now);
+      sound.play();
     }
-    this.now = this.audioRef.currentTime;
-    this.audioRef.play();
   }
   private isPlaying(): boolean {
     return true;
@@ -434,23 +564,25 @@ export default class App extends Vue {
       // this.nowMusicIsEned = false;
       console.log('自动监视是否播放完 next');
       if (this.isMobile()) {
-        this.nowMusicIsEned = false;
         console.log('自动监视是否播放完 next');
         console.log(
           'appCommonStoreModule.getAppCommon.audioCommon.src=' +
             appCommonStoreModule.getAppCommon.audioCommon.src
         );
         let musicUrl = '';
-        this.getPlayMusicUrl(2).then((val) => {
-          musicUrl = val;
-          console.log('asynchronous logging has val:', val);
-          const sound = new Howl({
-            src: [musicUrl],
-            html5: true,
+        if (this.nowMusicIsEned === true) {
+          this.getPlayMusicUrl(2).then((val) => {
+            musicUrl = val;
+            console.log('asynchronous logging has val:', val);
+            const sound = new Howl({
+              src: [musicUrl],
+              html5: true,
+            });
+            console.log('sound howl bofang ');
+            sound.play();
           });
-          console.log('sound howl bofang ');
-          sound.play();
-        });
+          // this.nowMusicIsEned = false;
+        }
       } else {
         //iphone
         let toggleMusic = this.toggleMusic(2).then(() => {
@@ -475,10 +607,10 @@ export default class App extends Vue {
   private stepFunction() {
     window.requestAnimationFrame(this.stepFunction.bind(this));
   }
-  private createTouchstartEventAndDispatch(el: any) {
+  private createTouchstartEventAndDispatch(el?: any) {
     console.log('crate touch is run');
 
-    let elem = document.querySelector('#nextmusic');
+    let elem = document.querySelector('#touchwillplay');
     if (elem) {
       // let elem1: EventTarget = elem;
       var touch = new Touch({
@@ -526,32 +658,11 @@ export default class App extends Vue {
   // 点击切换音乐
   private async getPlayMusicUrl(indexInputType: number): Promise<string> {
     let musicUrl = '';
-    let songDetailStoreVo: SongDetailStoreVo[] =
-      songDetailStoreModule.getSongsDetail;
     let songStoreVos: SongStoreVo[] =
       myClollectSongStoreModule.getMyCollectSongs;
-    let index = 0;
-    if (songDetailStoreVo && songDetailStoreVo.length > 0) {
-      let musicSrc = songDetailStoreVo[0].msrc;
-      let findindex = songStoreVos.findIndex((x) => x.msrc === musicSrc);
-
-      if (findindex > -1) {
-        if (indexInputType === 1) {
-          index = findindex - 1;
-        } else {
-          index = findindex + 1;
-        }
-      }
-    }
-    if (index < 0) {
-      index = songStoreVos.length - 1;
-    }
-    if (index > songStoreVos.length - 1) {
-      index = 0;
-    }
-    if (songStoreVos[index]) {
+    if (songStoreVos[indexInputType]) {
       //获取音乐详细信息
-      musicUrl = await this.getMusicDetail(songStoreVos[index]);
+      musicUrl = await this.getMusicDetail(songStoreVos[indexInputType]);
       console.log(musicUrl);
     }
     return musicUrl;

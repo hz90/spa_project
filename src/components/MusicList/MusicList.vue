@@ -47,6 +47,7 @@ import { SongStoreVo } from '@/store/vo/music-song-vo';
 import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon, Audio } from '@/store/vo/app-common';
 import { songDetailStoreModule } from '@/store/modules/song-detail-store';
+import { Howl } from 'howler';
 import {
   SongDetailStoreVo,
   SongDetailRequestVo,
@@ -103,31 +104,65 @@ export default class MusicList extends Vue {
       //   return;
       // }
       // console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
-      let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
+      // let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
 
-      //获取音乐详细信息
-      this.songStoreVos[index].tmpsrc = await this.getMusicDetail(
-        this.songStoreVos[index]
-      );
+      let audioCommonList: Audio[] = appCommon.audioCommonList;
 
-      if (songStoreVo.tmpsrc.indexOf('https') > -1) {
-        console.log('cloud music');
-        audioCommon.src = songStoreVo.tmpsrc;
-      } else {
-        audioCommon.src = 'http://localhost:8081' + songStoreVo.tmpsrc;
-      }
-      audioCommon.name = songStoreVo.name;
-      if (songStoreVo.psrc.indexOf('https') > -1) {
-        console.log('cloud music');
-        audioCommon.musicImgSrc = songStoreVo.psrc;
-      } else {
-        audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
-      }
-      audioCommon.index = 0;
-      appCommon.audioCommon = audioCommon;
-      appCommon.isPlaying = true;
-      appCommonStoreModule.setAppCommon(appCommon);
-      this.playVideo(appCommon);
+      audioCommonList.forEach((x) => {
+        if (x.src === songStoreVo.msrc) {
+          let audioCommonTmp = x;
+          appCommon.isPlaying = true;
+          appCommon.audioCommon.howl = audioCommonTmp.howl;
+          appCommon.audioCommon.name = audioCommonTmp.name;
+          appCommon.audioCommon.src = audioCommonTmp.src;
+          appCommon.audioCommon.tmpsrc = audioCommonTmp.tmpsrc;
+          appCommon.audioCommon.musicImgSrc = audioCommonTmp.musicImgSrc;
+          audioCommonTmp.howl.seek(0);
+          audioCommonTmp.howl.mute(false);
+          //audioCommonTmp.howl.play();
+          appCommonStoreModule.setAppCommon(appCommon);
+        } else {
+          // x.howl.pause();
+          x.howl.mute(true);
+        }
+      });
+
+      // //获取音乐详细信息
+      // this.songStoreVos[index].tmpsrc = await this.getMusicDetail(
+      //   this.songStoreVos[index]
+      // );
+
+      // if (songStoreVo.tmpsrc.indexOf('https') > -1) {
+      //   console.log('cloud music');
+      //   audioCommon.src = songStoreVo.tmpsrc;
+      // } else {
+      //   audioCommon.src = 'http://localhost:8081' + songStoreVo.tmpsrc;
+      // }
+      // audioCommon.name = songStoreVo.name;
+      // if (songStoreVo.psrc.indexOf('https') > -1) {
+      //   console.log('cloud music');
+      //   audioCommon.musicImgSrc = songStoreVo.psrc;
+      // } else {
+      //   audioCommon.musicImgSrc = 'http://127.0.0.1:8081' + songStoreVo.psrc;
+      // }
+      // audioCommon.index = 0;
+      // appCommon.audioCommon = audioCommon;
+      // appCommon.isPlaying = true;
+      // if (appCommon.audioCommon.howl) {
+      //   appCommon.audioCommon.howl.pause();
+      // }
+      // let sound = new Howl({
+      //   src: [this.songStoreVos[index].tmpsrc],
+      //   html5: true,
+      //   autoplay: true,
+      //   preload: true,
+      //   // loop: true,
+      // });
+      // appCommon.audioCommon.howl = sound;
+      // sound.play();
+      // appCommonStoreModule.setAppCommon(appCommon);
+      //this.playVideo(appCommon);
+      this.isLoading = false;
     }
   }
   private playVideo(appCommon: AppCommon): void {

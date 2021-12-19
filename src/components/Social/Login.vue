@@ -118,7 +118,16 @@ import { Component, Vue } from 'vue-property-decorator';
 import { loginModule } from '@/store/modules/login-store';
 import { publicKeyStoreModule } from '@/store/modules/publickey-store';
 import { loginStoreVo } from '@/store/vo/login-store-vo';
+import { SongStoreVo } from '@/store/vo/music-song-vo';
 import auth from '@/config/auth';
+import { Howl } from 'howler';
+import { songDetailStoreModule } from '@/store/modules/song-detail-store';
+import {
+  SongDetailStoreVo,
+  SongDetailRequestVo,
+} from '@/store/vo/music-song-detail-vo';
+import { appCommonStoreModule } from '@/store/modules/app-common-store';
+import { AppCommon, Audio } from '@/store/vo/app-common';
 import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
 @Component({
   name: 'Login',
@@ -154,7 +163,40 @@ export default class Login extends Vue {
         this.isLoading = false;
         this.success = true;
         loginModule.setLoginUsername(this.username);
-        myClollectSongStoreModule.exeGetMySongsApi();
+        myClollectSongStoreModule.exeGetMySongsApi().then(() => {
+          let songStoreVos: SongStoreVo[] =
+            myClollectSongStoreModule.getMyCollectSongs;
+          songStoreVos.forEach((x) => {
+            this.getPlayMusicUrl(x).then((val) => {
+              let willPlayMusicSrc = val;
+              let sound = new Howl({
+                src: [willPlayMusicSrc],
+                html5: true,
+                autoplay: true,
+                preload: true,
+                mute: true, // 初始时，是否静音
+                loop: true,
+              });
+              sound.play();
+              // sound.pause();
+              let appcommon = appCommonStoreModule.getAppCommon;
+              let audioCommonListTmp: Audio[];
+              if (appcommon.audioCommonList) {
+                audioCommonListTmp = appcommon.audioCommonList;
+              } else {
+                audioCommonListTmp = [];
+              }
+              appcommon.audioCommonList = audioCommonListTmp;
+              let indexAudio: Audio = Object.create(null) as Audio;
+              indexAudio.howl = sound;
+              indexAudio.name = x.name;
+              indexAudio.musicImgSrc = x.psrc;
+              indexAudio.src = x.msrc;
+              indexAudio.tmpsrc = x.tmpsrc;
+              audioCommonListTmp.push(indexAudio);
+            });
+          });
+        });
       })
       // eslint-disable-next-line
       .catch((error: any) => {
@@ -173,6 +215,32 @@ export default class Login extends Vue {
     this.success = false;
     auth.removeToken();
     this.$router.push('/login');
+  }
+  // 点击切换音乐
+  private async getPlayMusicUrl(songStoreVos: SongStoreVo): Promise<string> {
+    let musicUrl = '';
+    if (songStoreVos) {
+      //获取音乐详细信息
+      musicUrl = await this.getMusicDetail(songStoreVos);
+      console.log(musicUrl);
+    }
+    return musicUrl;
+  }
+  private async getMusicDetail(songStoreVos: SongStoreVo): Promise<string> {
+    let songDetailRequestVo: SongDetailRequestVo = Object.create(
+      null
+    ) as SongDetailRequestVo;
+    songDetailRequestVo = Object.assign(songDetailRequestVo, songStoreVos);
+    let songDetailRequestVos: SongDetailRequestVo[] = [];
+    songDetailRequestVos.push(songDetailRequestVo);
+    await songDetailStoreModule.exeGetSongsDetailApi(songDetailRequestVos);
+    let songDetailStoreVo: SongDetailStoreVo[] =
+      songDetailStoreModule.getSongsDetail;
+    if (songDetailStoreVo && songDetailStoreVo.length > 0) {
+      return songDetailStoreVo[0].tmpsrc;
+    } else {
+      return '';
+    }
   }
 }
 </script>

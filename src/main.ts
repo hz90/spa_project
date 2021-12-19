@@ -27,6 +27,8 @@ Vue.use(ButtonPlugin);
 Vue.config.productionTip = false;
 Vue.prototype.jsEncrypt = JsEncrypt;
 Hooks.hook(router);
+import { Howler } from 'howler';
+Howler.usingWebAudio = true;
 new Vue({
   router,
   store,

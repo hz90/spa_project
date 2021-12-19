@@ -119,6 +119,7 @@ import { appCommonStoreModule } from '@/store/modules/app-common-store';
 import { AppCommon, Audio } from '@/store/vo/app-common';
 import { songDetailStoreModule } from '@/store/modules/song-detail-store';
 import { myClollectSongStoreModule } from '@/store/modules/my-collect-song-store';
+import { Howl } from 'howler';
 import {
   SongDetailStoreVo,
   SongDetailRequestVo,
@@ -196,6 +197,11 @@ export default class Find extends Vue {
       //   return;
       // }
       // console.log('点击切换音乐' + JSON.stringify(this.songStoreVos[index]));
+      let audioCommonList: Audio[] = appCommon.audioCommonList;
+      audioCommonList.forEach((x) => {
+        x.howl.pause();
+        x.howl.mute(true);
+      });
       let audioCommon: Audio = appCommonStoreModule.getAppCommon.audioCommon;
 
       //获取音乐详细信息
@@ -219,8 +225,22 @@ export default class Find extends Vue {
       audioCommon.index = 0;
       appCommon.audioCommon = audioCommon;
       appCommon.isPlaying = true;
+      if (appCommon.audioCommon.howl) {
+        appCommon.audioCommon.howl.pause();
+      }
+      let sound = new Howl({
+        src: [this.songStoreVos[index].tmpsrc],
+        html5: true,
+        autoplay: true,
+        preload: true,
+        loop: true,
+      });
+      appCommon.audioCommon.howl = sound;
+
+      sound.play();
       appCommonStoreModule.setAppCommon(appCommon);
-      this.playVideo(appCommon);
+      // this.playVideo(appCommon);
+      this.isLoading = false;
     }
   }
   private playVideo(appCommon: AppCommon): void {
